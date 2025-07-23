@@ -1,0 +1,19 @@
+.user-page,
+.role-page {
+  padding: 20px;
+}
+
+.user-page h1,
+.role-page h1 {
+  margin: 0 0 16px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #343a40;
+}
+
+.user-page p,
+.role-page p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 16px;
+}

@@ -1,0 +1,108 @@
+/* 分页组件样式 */
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 8px 0;
+}
+
+.pagination-info {
+  color: #666;
+  font-size: 14px;
+}
+
+.page-size-select {
+  margin: 0 4px;
+  padding: 2px 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  background-color: #fff;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+}
+
+.pagination-button {
+  min-width: 32px;
+  height: 32px;
+  margin: 0 4px;
+  padding: 0 8px;
+  background-color: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  color: #333;
+}
+
+.pagination-button:hover:not(:disabled):not(.active):not(.ellipsis) {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+
+.pagination-button:disabled {
+  color: #d9d9d9;
+  cursor: not-allowed;
+}
+
+.pagination-button.active {
+  color: #fff;
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.pagination-button.ellipsis {
+  border: none;
+  background: none;
+  cursor: default;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .pagination {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .pagination-info {
+    text-align: center;
+    width: 100%;
+    order: 2;
+  }
+  
+  .pagination-controls {
+    width: 100%;
+    justify-content: center;
+    order: 1;
+  }
+  
+  .pagination-button {
+    min-width: 28px;
+    height: 28px;
+    margin: 0 2px;
+    padding: 0 6px;
+    font-size: 12px;
+  }
+  
+  /* 在移动端隐藏首页和末页按钮 */
+  .pagination-button:first-child,
+  .pagination-button:last-child {
+    display: none;
+  }
+}
+
+/* 平板设备 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .pagination-button {
+    min-width: 30px;
+    height: 30px;
+    margin: 0 3px;
+  }
+}

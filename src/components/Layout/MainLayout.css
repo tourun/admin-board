@@ -1,0 +1,53 @@
+.main-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+.main-layout__sidebar {
+  width: 200px;
+  min-width: 200px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.main-layout__content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+}
+
+/* 响应式设计 - 移动端 */
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+  }
+  
+  .main-layout__sidebar {
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .main-layout__content {
+    padding: 15px;
+  }
+}
+
+/* 响应式设计 - 平板端 */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .main-layout__sidebar {
+    width: 180px;
+    min-width: 180px;
+  }
+  
+  .main-layout__content {
+    padding: 18px;
+  }
+}

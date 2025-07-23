@@ -1,0 +1,31 @@
+#root {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  height: 100%;
+  width: 100%;
+}
+
+/* 页面基础样式 */
+.user-page,
+.role-page {
+  padding: 20px;
+}
+
+.user-page h1,
+.role-page h1 {
+  margin: 0 0 16px 0;
+  color: #343a40;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.user-page p,
+.role-page p {
+  color: #6c757d;
+  font-size: 14px;
+  margin: 0;
+}
