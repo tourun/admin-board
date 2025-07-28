@@ -53,7 +53,7 @@ const validateUser = (userData) => {
  * 获取用户列表
  * @param {Object} params - 查询参数
  * @param {Object} params.pagination - 分页参数 {current, pageSize}
- * @param {Object} params.filters - 筛选参数 {first_name, last_name}
+ * @param {Object} params.filters - 筛选参数（暂时移除 firstName 和 lastName 筛选）
  * @param {Object} params.sorter - 排序参数 {field, order}
  * @returns {Promise} - 返回用户数据和分页信息
  */
@@ -68,20 +68,10 @@ export const getUsers = async (params = {}) => {
       sorter = {}
     } = params;
 
-    // 应用筛选
+    // 应用筛选 - 暂时移除 firstName 和 lastName 筛选
     let filteredUsers = [...users];
 
-    if (filters.first_name) {
-      filteredUsers = filteredUsers.filter(user =>
-        user.first_name.toLowerCase().includes(filters.first_name.toLowerCase())
-      );
-    }
-
-    if (filters.last_name) {
-      filteredUsers = filteredUsers.filter(user =>
-        user.last_name.toLowerCase().includes(filters.last_name.toLowerCase())
-      );
-    }
+    // 如果以后需要添加其他筛选条件，可以在这里添加
 
     // 应用排序
     if (sorter.field) {
@@ -168,6 +158,62 @@ export const createUser = async (userData) => {
 };
 
 /**
+ * 根据ID获取单个用户
+ * @param {string} userId - 用户ID (staff_id)
+ * @returns {Promise} - 返回用户数据
+ */
+export const getUserById = async (userId) => {
+  try {
+    // 模拟网络延迟
+    await simulateNetworkDelay();
+
+    // 根据 staff_id 查找用户
+    const user = users.find(u => u.staff_id === userId);
+
+    if (!user) {
+      throw new Error(`User with ID ${userId} not found`);
+    }
+    console.log(`user is ${JSON.stringify(user)}`);
+
+    return user;
+  } catch (error) {
+    console.error('Failed to get user:', error);
+    throw error;
+  }
+};
+
+/**
+ * 删除用户
+ * @param {string} userId - 用户ID (staff_id)
+ * @returns {Promise} - 返回删除结果
+ */
+export const deleteUser = async (userId) => {
+  try {
+    // 模拟网络延迟
+    await simulateNetworkDelay();
+
+    // 查找用户索引
+    const userIndex = users.findIndex(u => u.staff_id === userId);
+
+    if (userIndex === -1) {
+      throw new Error(`User with ID ${userId} not found`);
+    }
+
+    // 删除用户
+    const deletedUser = users.splice(userIndex, 1)[0];
+
+    return {
+      success: true,
+      data: deletedUser,
+      message: 'User deleted successfully'
+    };
+  } catch (error) {
+    console.error('Failed to delete user:', error);
+    throw error;
+  }
+};
+
+/**
  * 重置用户数据（用于测试）
  */
 export const resetUsers = () => {
@@ -178,6 +224,8 @@ export const resetUsers = () => {
 const userService = {
   getUsers,
   createUser,
+  getUserById,
+  deleteUser,
   resetUsers
 };
 

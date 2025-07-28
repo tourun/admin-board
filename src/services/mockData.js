@@ -92,7 +92,7 @@ export const generateUsers = (count = 50) => {
  * @param {number} max - 最大延迟时间(ms)
  * @returns {Promise} - 延迟Promise
  */
-export const simulateNetworkDelay = (min = 200, max = 800) => {
+export const simulateNetworkDelay = (min = 200, max = 500) => {
     const delay = Math.floor(Math.random() * (max - min + 1)) + min;
     return new Promise(resolve => setTimeout(resolve, delay));
 };

@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react';
+import { useLoaderData, Outlet, useNavigate } from 'react-router-dom';
 import UserTable from '../components/User/UserTable';
-import CreateUserModal from '../components/User/CreateUserModal';
 import Notification from '../components/User/Notification';
+import DeferredData from '../components/Common/DeferredData';
 import useUsers from '../hooks/useUsers';
 import './UserPage.css';
 
-const UserPage = () => {
-    // 使用自定义Hook获取用户数据和操作方法
+// 用户页面内容组件 - 接收解析后的数据并处理所有业务逻辑
+const UserPageContent = ({ usersData }) => {
+    console.log("UserPageContent rendering with data:", usersData);
+
+    const navigate = useNavigate();
+
+    // 使用自定义Hook获取用户数据和操作方法，传入初始数据
     const {
         users,
         loading,
@@ -15,20 +21,14 @@ const UserPage = () => {
         filters,
         sorter,
         fetchUsers,
-        createUser,
-        handleTableChange
-    } = useUsers();
-
-    // 模态框状态
-    const [modalOpen, setModalOpen] = useState(false);
-    const [submitLoading, setSubmitLoading] = useState(false);
-    const [submitError, setSubmitError] = useState(null);
+        handleTableChange,
+    } = useUsers(usersData);
 
     // 通知状态
     const [notification, setNotification] = useState({
         show: false,
         type: '',
-        message: ''
+        message: '',
     });
 
     // 显示通知
@@ -36,15 +36,15 @@ const UserPage = () => {
         setNotification({
             show: true,
             type,
-            message
+            message,
         });
     };
 
     // 关闭通知
     const handleCloseNotification = () => {
-        setNotification(prev => ({
+        setNotification((prev) => ({
             ...prev,
-            show: false
+            show: false,
         }));
     };
 
@@ -55,41 +55,9 @@ const UserPage = () => {
         }
     }, [error]);
 
-    // 打开模态框
-    const handleOpenModal = () => {
-        setModalOpen(true);
-        setSubmitError(null);
-    };
-
-    // 关闭模态框
-    const handleCloseModal = () => {
-        setModalOpen(false);
-    };
-
-    // 处理用户创建
-    const handleCreateUser = async (userData) => {
-        setSubmitLoading(true);
-        setSubmitError(null);
-
-        try {
-            const result = await createUser(userData);
-
-            if (!result.success) {
-                setSubmitError(result.error);
-                return { success: false };
-            }
-
-            // 显示成功通知
-            showNotification('success', 'User created successfully!');
-
-            return { success: true, data: result.data };
-        } catch (error) {
-            console.error('Error creating user:', error);
-            setSubmitError('Failed to create user, please try again');
-            return { success: false };
-        } finally {
-            setSubmitLoading(false);
-        }
+    // 跳转到创建用户页面
+    const handleCreateUser = () => {
+        navigate('/users/new');
     };
 
     // 处理重试加载
@@ -98,12 +66,12 @@ const UserPage = () => {
     };
 
     return (
-        <div className="user-page">
+        <>
             <div className="user-page__header">
                 <h1 className="user-page__title">User Management</h1>
                 <button
                     className="user-page__add-button"
-                    onClick={handleOpenModal}
+                    onClick={handleCreateUser}
                     disabled={loading}
                 >
                     Create New User
@@ -128,20 +96,30 @@ const UserPage = () => {
                 )}
             </div>
 
-            <CreateUserModal
-                isOpen={modalOpen}
-                onRequestClose={handleCloseModal}
-                onSubmit={handleCreateUser}
-                loading={submitLoading}
-                submitError={submitError}
-            />
-
             <Notification
                 show={notification.show}
                 type={notification.type}
                 message={notification.message}
                 onClose={handleCloseNotification}
             />
+        </>
+    );
+};
+
+// 主 UserPage 组件 - 处理数据加载
+const UserPage = () => {
+    console.log("UserPage rendering...")
+
+    const { usersData } = useLoaderData();
+
+    return (
+        <div className="user-page">
+            <DeferredData data={usersData}>
+                {(resolvedUsersData) => <UserPageContent usersData={resolvedUsersData} />}
+            </DeferredData>
+
+            {/* 嵌套路由出口 */}
+            <Outlet />
         </div>
     );
 };

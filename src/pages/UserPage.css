@@ -1,84 +1,194 @@
-/* UserPage 样式 */
 
 .user-page {
-  padding: 24px;
+  padding: 32px;
+  min-height: 100vh;
+  background: transparent;
 }
 
 .user-page__header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  align-items: flex-end;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 3px solid #DC143C;
+  position: relative;
+}
+
+.user-page__header::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #DC143C, transparent);
 }
 
 .user-page__title {
   margin: 0;
-  font-size: 24px;
-  color: #333;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+}
+
+.user-page__subtitle {
+  margin: 8px 0 0 0;
+  font-size: 16px;
+  color: #666666;
+  font-weight: 400;
 }
 
 .user-page__add-button {
   padding: 8px 16px;
-  background-color: #1890ff;
-  border: none;
-  border-radius: 4px;
+  background: #db0011;
+  border: 1px solid #db0011;
   color: white;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.user-page__add-button:hover {
-  background-color: #40a9ff;
+.user-page__add-button:hover:not(:disabled) {
+  background: #83000a;
+  border-color: #83000a;
 }
 
 .user-page__add-button:disabled {
-  background-color: #bae7ff;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .user-page__content {
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #f1f5f9;
 }
 
 .user-page__error {
-  padding: 16px;
-  background-color: #fff1f0;
-  border: 1px solid #ffccc7;
-  border-radius: 4px;
-  color: #f5222d;
+  padding: 24px;
+  background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+  border: 1px solid #feb2b2;
+  border-left: 4px solid #DC143C;
+  border-radius: 8px;
+  color: #DC143C;
   text-align: center;
+  margin: 24px;
+}
+
+.user-page__error h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.user-page__error p {
+  margin: 0 0 16px 0;
+  font-size: 14px;
 }
 
 .user-page__error button {
-  margin-top: 8px;
-  padding: 4px 12px;
-  background-color: white;
-  border: 1px solid #d9d9d9;
-  border-radius: 2px;
+  padding: 10px 20px;
+  background: #DC143C;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .user-page__error button:hover {
-  color: #1890ff;
-  border-color: #1890ff;
+  background: #B91C3C;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
 }
 
 .user-page__placeholder {
   text-align: center;
-  padding: 48px 0;
-  color: #999;
+  padding: 64px 32px;
+  color: #718096;
+}
+
+.user-page__placeholder h3 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #4a5568;
 }
 
 .user-page__placeholder-info {
-  font-size: 14px;
-  margin-top: 8px;
+  font-size: 16px;
+  margin: 0;
+  line-height: 1.6;
 }
 
-/* 响应式设计 */
+/* 加载状态样式 */
+.user-page__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 64px;
+}
+
+.user-page__loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.user-page__loading-spinner .spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f1f5f9;
+  border-top: 4px solid #DC143C;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.user-page__loading-spinner p {
+  margin: 0;
+  color: #4a5568;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 响应式设计 - 平板端 */
+@media (max-width: 1024px) {
+  .user-page {
+    padding: 24px;
+  }
+  
+  .user-page__title {
+    font-size: 28px;
+  }
+  
+  .user-page__add-button {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}
+
+/* 响应式设计 - 移动端 */
 @media (max-width: 768px) {
   .user-page {
     padding: 16px;
@@ -87,8 +197,44 @@
   .user-page__header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+  }
+  
+  .user-page__title {
+    font-size: 24px;
+  }
+  
+  .user-page__add-button {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 0;
+  }
+  
+  .user-page__content {
+    border-radius: 8px;
+  }
+  
+  .user-page__error {
+    margin: 16px;
+    padding: 20px;
+  }
+  
+  .user-page__placeholder {
+    padding: 48px 24px;
+  }
+}
+
+/* 小屏幕优化 */
+@media (max-width: 480px) {
+  .user-page {
+    padding: 12px;
+  }
+  
+  .user-page__header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
   }
   
   .user-page__title {
@@ -96,24 +242,19 @@
   }
   
   .user-page__add-button {
-    width: 100%;
-    padding: 8px 0;
-    text-align: center;
+    padding: 12px 0;
+    font-size: 14px;
   }
   
-  .user-page__content {
-    padding: 16px;
-    border-radius: 3px;
-  }
-}
-
-/* 平板设备 */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .user-page {
-    padding: 20px;
+  .user-page__placeholder {
+    padding: 40px 16px;
   }
   
-  .user-page__content {
-    padding: 20px;
+  .user-page__placeholder h3 {
+    font-size: 18px;
+  }
+  
+  .user-page__placeholder-info {
+    font-size: 14px;
   }
 }

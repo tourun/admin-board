@@ -1,9 +1,10 @@
 /**
  * UserTable 组件
- * 使用 @tanstack/react-table 实现用户数据表格
+ * 使用 @tanstack/react-table v8 实现用户数据表格
  */
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useNavigate, useFetcher } from 'react-router-dom';
 import {
     useReactTable,
     getCoreRowModel,
@@ -32,17 +33,21 @@ const UserTable = ({
     sorter = {},
     onTableChange = () => { }
 }) => {
+    const navigate = useNavigate();
+    const fetcher = useFetcher();
+
+    // 处理删除用户
+    const handleDeleteUser = useCallback((userId) => {
+        if (window.confirm('Are you sure you want to delete this user?')) {
+            fetcher.submit(null, {
+                method: 'post',
+                action: `/users/${userId}/delete`
+            });
+        }
+    }, [fetcher]);
+
     // 排序状态
     const [sorting, setSorting] = useState([]);
-
-    // 筛选状态
-    const [filterValues, setFilterValues] = useState({
-        first_name: '',
-        last_name: ''
-    });
-
-    // 防抖定时器
-    const [filterTimer, setFilterTimer] = useState(null);
 
     // 同步外部排序状态到内部状态
     useEffect(() => {
@@ -58,78 +63,6 @@ const UserTable = ({
         }
     }, [sorter]);
 
-    // 同步外部筛选状态到内部状态
-    useEffect(() => {
-        setFilterValues({
-            first_name: filters.first_name || '',
-            last_name: filters.last_name || ''
-        });
-    }, [filters]);
-
-    // 处理筛选变化
-    const handleFilterChange = useCallback((field, value) => {
-        // 更新内部筛选状态
-        setFilterValues(prev => ({
-            ...prev,
-            [field]: value
-        }));
-
-        // 清除之前的定时器
-        if (filterTimer) {
-            clearTimeout(filterTimer);
-        }
-
-        // 设置新的定时器（防抖，300ms）
-        const timer = setTimeout(() => {
-            // 构建新的筛选条件
-            const newFilters = {
-                ...filters,
-                [field]: value
-            };
-
-            // 如果值为空，则删除该筛选条件
-            if (!value) {
-                delete newFilters[field];
-            }
-
-            // 调用表格变化回调，重置到第一页
-            onTableChange(
-                { ...pagination, current: 1 },
-                newFilters,
-                sorter
-            );
-        }, 300);
-
-        setFilterTimer(timer);
-    }, [filters, pagination, sorter, filterTimer, onTableChange]);
-
-    // 清除所有筛选
-    const clearAllFilters = () => {
-        setFilterValues({
-            first_name: '',
-            last_name: ''
-        });
-
-        onTableChange(
-            { ...pagination, current: 1 },
-            {},
-            sorter
-        );
-    };
-
-    // 检测窗口宽度
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-    // 监听窗口大小变化
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768);
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
     // 定义表格列
     const columns = useMemo(() => [
         {
@@ -141,46 +74,14 @@ const UserTable = ({
             header: 'Location',
             accessorKey: 'location',
             enableSorting: true,
-            // 在移动端隐藏此列
-            meta: {
-                className: isMobile ? 'hide-on-mobile' : ''
-            }
         },
         {
-            header: () => (
-                <div className="column-header-with-filter">
-                    <div className="header-content">
-                        <span>First Name</span>
-                        <input
-                            type="text"
-                            className="column-filter"
-                            placeholder="Filter first name..."
-                            value={filterValues.first_name}
-                            onChange={(e) => handleFilterChange('first_name', e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                    </div>
-                </div>
-            ),
+            header: 'First Name',
             accessorKey: 'first_name',
             enableSorting: true,
         },
         {
-            header: () => (
-                <div className="column-header-with-filter">
-                    <div className="header-content">
-                        <span>Last Name</span>
-                        <input
-                            type="text"
-                            className="column-filter"
-                            placeholder="Filter last name..."
-                            value={filterValues.last_name}
-                            onChange={(e) => handleFilterChange('last_name', e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                    </div>
-                </div>
-            ),
+            header: 'Last Name',
             accessorKey: 'last_name',
             enableSorting: true,
         },
@@ -190,14 +91,8 @@ const UserTable = ({
             enableSorting: true,
             cell: ({ getValue }) => {
                 const date = new Date(getValue());
-                return isMobile
-                    ? date.toLocaleDateString('en-US') // 移动端只显示日期
-                    : date.toLocaleString('en-US');    // 桌面端显示日期和时间
+                return date.toLocaleString('en-US');
             },
-            // 在移动端隐藏此列
-            meta: {
-                className: isMobile ? 'hide-on-mobile' : ''
-            }
         },
         {
             header: 'Status',
@@ -205,7 +100,29 @@ const UserTable = ({
             enableSorting: true,
             cell: ({ getValue }) => (getValue() ? 'Active' : 'Inactive'),
         },
-    ], [filterValues, handleFilterChange, isMobile]);
+        {
+            header: 'Actions',
+            id: 'actions',
+            enableSorting: false,
+            cell: ({ row }) => (
+                <div className="actions-cell">
+                    <button
+                        className="view-detail-button"
+                        onClick={() => navigate(`/users/${row.original.staff_id}`)}
+                    >
+                        View Detail
+                    </button>
+                    <button
+                        className="delete-button"
+                        onClick={() => handleDeleteUser(row.original.staff_id)}
+                        disabled={fetcher.state === 'submitting'}
+                    >
+                        {fetcher.state === 'submitting' ? 'Deleting...' : 'Delete'}
+                    </button>
+                </div>
+            ),
+        },
+    ], [navigate, fetcher.state, handleDeleteUser]);
 
     // 初始化表格实例
     const table = useReactTable({
@@ -231,6 +148,7 @@ const UserTable = ({
         },
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        manualSorting: true,
     });
 
     // 处理分页变化
@@ -238,53 +156,8 @@ const UserTable = ({
         onTableChange(newPagination, filters, sorter);
     };
 
-    // 渲染筛选状态和清除按钮
-    const renderFilterStatus = () => {
-        const hasFilters = Object.keys(filters).length > 0;
-
-        if (!hasFilters) return null;
-
-        return (
-            <div className="filter-status">
-                <span>Filters: </span>
-                {filters.first_name && (
-                    <span className="filter-tag">
-                        First Name: {filters.first_name}
-                        <button
-                            className="clear-filter-btn"
-                            onClick={() => handleFilterChange('first_name', '')}
-                        >
-                            ×
-                        </button>
-                    </span>
-                )}
-                {filters.last_name && (
-                    <span className="filter-tag">
-                        Last Name: {filters.last_name}
-                        <button
-                            className="clear-filter-btn"
-                            onClick={() => handleFilterChange('last_name', '')}
-                        >
-                            ×
-                        </button>
-                    </span>
-                )}
-                <button
-                    className="clear-all-filters-btn"
-                    onClick={clearAllFilters}
-                >
-                    Clear All Filters
-                </button>
-            </div>
-        );
-    };
-
     return (
         <div className="user-table-container">
-            {loading && <div className="loading-overlay">Loading...</div>}
-
-            {renderFilterStatus()}
-
             <table className="user-table">
                 <thead>
                     {table.getHeaderGroups().map(headerGroup => (
@@ -292,31 +165,29 @@ const UserTable = ({
                             {headerGroup.headers.map(header => (
                                 <th
                                     key={header.id}
-                                    className={header.column.columnDef.meta?.className || ''}
+                                    className={header.column.getCanSort() ? 'sortable-header' : ''}
                                 >
-                                    {header.isPlaceholder ? null : (
-                                        <div
-                                            {...{
-                                                className: header.column.getCanSort() ? 'sortable-header' : '',
-                                                onClick: header.column.getCanSort() && !header.column.columnDef.header.type
-                                                    ? header.column.getToggleSortingHandler()
-                                                    : undefined,
-                                            }}
-                                        >
-                                            {flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                            )}
-                                            {header.column.getCanSort() && !header.column.columnDef.header.type && (
-                                                <span className="sort-indicator">
-                                                    {{
-                                                        asc: ' ↑',
-                                                        desc: ' ↓',
-                                                    }[header.column.getIsSorted()] ?? ' ↕'}
-                                                </span>
-                                            )}
-                                        </div>
-                                    )}
+                                    <div
+                                        {...{
+                                            onClick: header.column.getCanSort()
+                                                ? header.column.getToggleSortingHandler()
+                                                : undefined,
+                                        }}
+                                        className="header-wrapper"
+                                    >
+                                        {flexRender(
+                                            header.column.columnDef.header,
+                                            header.getContext()
+                                        )}
+                                        {header.column.getCanSort() && (
+                                            <span className="sort-indicator">
+                                                {{
+                                                    asc: ' ↑',
+                                                    desc: ' ↓',
+                                                }[header.column.getIsSorted()] ?? ' ↕'}
+                                            </span>
+                                        )}
+                                    </div>
                                 </th>
                             ))}
                         </tr>
@@ -326,10 +197,7 @@ const UserTable = ({
                     {table.getRowModel().rows.map(row => (
                         <tr key={row.id}>
                             {row.getVisibleCells().map(cell => (
-                                <td
-                                    key={cell.id}
-                                    className={cell.column.columnDef.meta?.className || ''}
-                                >
+                                <td key={cell.id}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </td>
                             ))}
