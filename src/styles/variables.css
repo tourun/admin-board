@@ -4,44 +4,46 @@
   --primary-color: #1890ff;
   --primary-hover: #40a9ff;
   --primary-active: #096dd9;
-  
+
   --success-color: #52c41a;
   --warning-color: #faad14;
   --error-color: #ff4d4f;
   --info-color: #1890ff;
-  
+
   --text-primary: #262626;
   --text-secondary: #595959;
   --text-disabled: #bfbfbf;
   --text-inverse: #ffffff;
-  
+
   --bg-primary: #ffffff;
   --bg-secondary: #fafafa;
   --bg-disabled: #f5f5f5;
   --bg-hover: #f0f0f0;
-  
+
   --border-color: #d9d9d9;
   --border-color-hover: #40a9ff;
   --border-radius: 6px;
-  
+
   /* Layout */
   --sidebar-width: 200px;
   --header-height: 64px;
   --content-padding: 24px;
-  
+
   /* Typography */
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
   --font-size-xs: 12px;
   --font-size-sm: 14px;
   --font-size-base: 16px;
   --font-size-lg: 18px;
   --font-size-xl: 20px;
   --font-size-xxl: 24px;
-  
+
   --line-height-base: 1.5;
   --line-height-sm: 1.4;
   --line-height-lg: 1.6;
-  
+
   /* Spacing */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -49,37 +51,19 @@
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-xxl: 48px;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
   --shadow-base: 0 1px 8px rgba(0, 0, 0, 0.15);
   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
-  
+
   /* Transitions */
   --transition-fast: 0.1s;
   --transition-base: 0.3s;
   --transition-slow: 0.5s;
-  
+
   /* Z-index */
   --z-dropdown: 1050;
   --z-modal: 1060;
   --z-tooltip: 1070;
-}
-
-/* Dark theme support (optional) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text-primary: #ffffff;
-    --text-secondary: #a6a6a6;
-    --text-disabled: #595959;
-    --text-inverse: #262626;
-    
-    --bg-primary: #141414;
-    --bg-secondary: #1f1f1f;
-    --bg-disabled: #262626;
-    --bg-hover: #262626;
-    
-    --border-color: #434343;
-    --border-color-hover: #40a9ff;
-  }
 }

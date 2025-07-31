@@ -64,7 +64,6 @@ export const getUsers = async (params = {}) => {
 
     const {
       pagination = { current: 1, pageSize: 10 },
-      filters = {},
       sorter = {}
     } = params;
 
@@ -134,13 +133,16 @@ export const createUser = async (userData) => {
     }
 
     // 创建新用户
+    const now = new Date().toISOString();
     const newUser = {
       id: Math.random().toString(36).substring(2, 10), // 简单的随机ID
       staff_id: userData.staff_id,
       location: userData.location,
       first_name: userData.first_name,
       last_name: userData.last_name,
-      created_at: new Date().toISOString(),
+      created_at: now,
+      updated_at: now,
+      updated_by: 'system', // 可以根据实际需求修改为当前登录用户
       is_active: userData.is_active !== undefined ? userData.is_active : true
     };
 

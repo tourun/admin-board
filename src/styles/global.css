@@ -33,20 +33,20 @@ a:hover {
 }
 
 /* Sidebar 链接样式覆盖 */
-.sidebar__menu-link {
+.sidebar-menu-link {
   color: #d1d5db !important;
 }
 
-.sidebar__menu-link:hover {
+.sidebar-menu-link:hover {
   color: #d1d5db !important;
   text-decoration: none !important;
 }
 
-.sidebar__menu-link--active {
+.sidebar-menu-link--active {
   color: #ffffff !important;
 }
 
-.sidebar__menu-link--active:hover {
+.sidebar-menu-link--active:hover {
   color: #ffffff !important;
   text-decoration: none !important;
 }

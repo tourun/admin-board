@@ -8,7 +8,7 @@
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
-.main-layout__header {
+.main-layout-header {
   background: #2d2d2d;
   color: #ffffff;
   padding: 0 24px;
@@ -21,25 +21,25 @@
   z-index: 100;
 }
 
-.main-layout__logo {
+.main-layout-logo {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.main-layout__logo-text {
+.main-layout-logo-text {
   font-size: 24px;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.5px;
 }
 
-.main-layout__logo-accent {
+.main-layout-logo-accent {
   color: #db0011;
   font-weight: 800;
 }
 
-.main-layout__user-info {
+.main-layout-user-info {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -47,21 +47,21 @@
   font-size: 14px;
 }
 
-.main-layout__body {
+.main-layout-body {
   display: flex;
   flex: 1;
   min-height: 0;
 }
 
-.main-layout__sidebar {
-  width: 240px;
-  min-width: 240px;
+.main-layout-sidebar {
+  width: 180px;
+  min-width: 180px;
   background: #2d2d2d;
   border-right: 1px solid #404040;
   flex-shrink: 0;
 }
 
-.main-layout__content {
+.main-layout-content {
   flex: 1;
   min-width: 0;
   overflow-y: auto;
@@ -69,13 +69,13 @@
   position: relative;
 }
 
-.main-layout__outlet {
+.main-layout-outlet {
   min-height: 100%;
   transition: opacity 0.3s ease-in-out;
 }
 
 /* 加载状态样式 */
-.main-layout__loading-overlay {
+.main-layout-loading-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -89,7 +89,7 @@
   backdrop-filter: blur(4px);
 }
 
-.main-layout__loading-spinner {
+.main-layout-loading-spinner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -100,13 +100,12 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.main-layout__loading-spinner p {
+.main-layout-loading-spinner p {
   margin: 0;
   color: #4a5568;
   font-size: 16px;
   font-weight: 500;
 }
-
 
 .spinner {
   width: 48px;
@@ -127,70 +126,8 @@
 }
 
 /* 加载状态下的内容样式 */
-.main-layout__outlet.loading {
+.main-layout-outlet.loading {
   opacity: 0.7;
   pointer-events: none;
-}
-
-/* 响应式设计 - 平板端 */
-@media (max-width: 1024px) {
-  .main-layout__header {
-    padding: 0 24px;
-    height: 70px;
-  }
-
-  .main-layout__logo-text {
-    font-size: 20px;
-  }
-
-  .main-layout__sidebar {
-    width: 200px;
-    min-width: 200px;
-  }
-}
-
-/* 响应式设计 - 移动端 */
-@media (max-width: 768px) {
-  .main-layout__header {
-    padding: 0 16px;
-    height: 60px;
-  }
-
-  .main-layout__logo-text {
-    font-size: 18px;
-  }
-
-  .main-layout__user-info {
-    display: none;
-  }
-
-  .main-layout__body {
-    flex-direction: column;
-  }
-
-  .main-layout__sidebar {
-    width: 100%;
-    min-width: unset;
-    height: auto;
-    border-right: none;
-    border-bottom: 1px solid #e2e8f0;
-    order: 2;
-  }
-
-  .main-layout__content {
-    order: 1;
-    flex: 1;
-  }
-}
-
-/* 小屏幕优化 */
-@media (max-width: 480px) {
-  .main-layout__header {
-    padding: 0 12px;
-    height: 56px;
-  }
-
-  .main-layout__logo-text {
-    font-size: 16px;
-  }
+  position: relative;
 }

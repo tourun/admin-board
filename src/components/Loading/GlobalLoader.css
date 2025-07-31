@@ -12,7 +12,7 @@
   backdrop-filter: blur(2px);
 }
 
-.global-loader__content {
+.global-loader-content {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,7 +23,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.global-loader__spinner .spinner {
+.global-loader-spinner .spinner {
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
@@ -32,7 +32,7 @@
   animation: spin 1s linear infinite;
 }
 
-.global-loader__message {
+.global-loader-message {
   margin: 0;
   color: #666;
   font-size: 16px;
@@ -40,6 +40,10 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

@@ -33,6 +33,19 @@ export const useUsers = (initialData = null) => {
     // 排序状态
     const [sorter, setSorter] = useState({});
 
+    // 监听initialData变化，更新状态
+    useEffect(() => {
+        if (initialData) {
+            setUsers(initialData.users || []);
+            setError(initialData.error || null);
+            setPagination(initialData.pagination || {
+                current: 1,
+                pageSize: 10,
+                total: 0
+            });
+        }
+    }, [initialData]);
+
     /**
      * 获取用户数据
      * @param {Object} params - 查询参数（可选）

@@ -72,13 +72,19 @@ export const generateUsers = (count = 50) => {
         const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
         const location = locations[Math.floor(Math.random() * locations.length)];
 
+        const createdAt = generateDate();
+        const createdDate = new Date(createdAt);
+        const updatedAt = new Date(createdDate.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000); // 创建后0-30天内更新
+
         users.push({
             id: generateId(),
             staff_id: generateStaffId(),
             location,
             first_name: firstName,
             last_name: lastName,
-            created_at: generateDate(),
+            created_at: createdAt,
+            updated_at: updatedAt.toISOString(),
+            updated_by: `admin_${Math.floor(Math.random() * 5) + 1}`, // admin_1 到 admin_5
             is_active: Math.random() > 0.2 // 80%的用户是激活状态
         });
     }

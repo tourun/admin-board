@@ -1,4 +1,3 @@
-
 .user-detail {
   padding: 32px;
   max-width: 800px;
@@ -6,24 +5,24 @@
   min-height: 100vh;
 }
 
-.user-detail__header {
+.user-detail-header {
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 3px solid #DC143C;
+  border-bottom: 3px solid #dc143c;
   position: relative;
 }
 
-.user-detail__header::after {
+.user-detail-header::after {
   content: '';
   position: absolute;
   bottom: -3px;
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, #DC143C, transparent);
+  background: linear-gradient(90deg, transparent, #dc143c, transparent);
 }
 
-.user-detail__back-button {
+.user-detail-back-button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -39,12 +38,12 @@
   margin-bottom: 16px;
 }
 
-.user-detail__back-button:hover {
+.user-detail-back-button:hover {
   background: #f9fafb;
   border-color: #9ca3af;
 }
 
-.user-detail__title {
+.user-detail-title {
   margin: 0;
   font-size: 32px;
   font-weight: 700;
@@ -52,14 +51,7 @@
   letter-spacing: -0.5px;
 }
 
-.user-detail__subtitle {
-  margin: 8px 0 0 0;
-  font-size: 16px;
-  color: #666666;
-  font-weight: 400;
-}
-
-.user-detail__content {
+.user-detail-content {
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -67,11 +59,11 @@
   border: 1px solid #f1f5f9;
 }
 
-.user-detail__card {
+.user-detail-card {
   padding: 40px;
 }
 
-.user-detail__field {
+.user-detail-field {
   display: flex;
   align-items: center;
   padding: 20px 0;
@@ -79,18 +71,18 @@
   transition: all 0.3s ease;
 }
 
-.user-detail__field:last-child {
+.user-detail-field:last-child {
   border-bottom: none;
 }
 
-.user-detail__field:hover {
+.user-detail-field:hover {
   background: linear-gradient(135deg, #f8f9fa 0%, #f1f5f9 100%);
   margin: 0 -20px;
   padding: 20px 20px;
   border-radius: 8px;
 }
 
-.user-detail__label {
+.user-detail-label {
   font-weight: 600;
   color: #4a5568;
   min-width: 180px;
@@ -99,21 +91,21 @@
   letter-spacing: 0.3px;
 }
 
-.user-detail__label::after {
+.user-detail-label::after {
   content: ':';
   margin-left: 4px;
-  color: #DC143C;
+  color: #dc143c;
   font-weight: 700;
 }
 
-.user-detail__value {
+.user-detail-value {
   color: #1a1a1a;
   font-size: 16px;
   font-weight: 500;
   flex: 1;
 }
 
-.user-detail__status {
+.user-detail-status {
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 13px;
@@ -125,34 +117,34 @@
   gap: 6px;
 }
 
-.user-detail__status::before {
+.user-detail-status::before {
   content: '';
   width: 8px;
   height: 8px;
   border-radius: 50%;
 }
 
-.user-detail__status.active {
-  background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+.user-detail-status.active {
+  background: #c6f6d5;
   color: #22543d;
   border: 2px solid #9ae6b4;
 }
 
-.user-detail__status.active::before {
+.user-detail-status.active::before {
   background: #38a169;
 }
 
-.user-detail__status.inactive {
-  background: linear-gradient(135deg, #fffaf0 0%, #fbd38d 100%);
-  color: #744210;
-  border: 2px solid #f6ad55;
+.user-detail-status.inactive {
+  background: #e5e7eb;
+  color: #6b7280;
+  border: 2px solid #d1d5db;
 }
 
-.user-detail__status.inactive::before {
-  background: #ed8936;
+.user-detail-status.inactive::before {
+  background: #9ca3af;
 }
 
-.user-detail__error {
+.user-detail-error {
   text-align: center;
   padding: 80px 40px;
   background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
@@ -160,22 +152,16 @@
   margin: 32px;
 }
 
-.user-detail__error h2 {
-  color: #DC143C;
+.user-detail-error h2 {
+  color: #dc143c;
   margin: 0 0 16px 0;
   font-size: 24px;
   font-weight: 700;
 }
 
-.user-detail__error p {
-  color: #4a5568;
-  margin: 0 0 24px 0;
-  font-size: 16px;
-}
-
-.user-detail__error button {
+.user-detail-error button {
   padding: 12px 24px;
-  background: #DC143C;
+  background: #dc143c;
   border: none;
   border-radius: 8px;
   color: white;
@@ -184,153 +170,8 @@
   transition: all 0.3s ease;
 }
 
-.user-detail__error button:hover {
-  background: #B91C3C;
+.user-detail-error button:hover {
+  background: #b91c3c;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
-}
-
-/* 加载状态样式 */
-.user-detail__loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  padding: 64px;
-}
-
-.user-detail__loading-spinner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: 32px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.user-detail__loading-spinner .spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #f1f5f9;
-  border-top: 4px solid #DC143C;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.user-detail__loading-spinner p {
-  margin: 0;
-  color: #4a5568;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* 响应式设计 - 平板端 */
-@media (max-width: 1024px) {
-  .user-detail {
-    padding: 24px;
-  }
-  
-  .user-detail__title {
-    font-size: 28px;
-  }
-  
-  .user-detail__card {
-    padding: 32px 24px;
-  }
-  
-  .user-detail__label {
-    min-width: 160px;
-    margin-right: 20px;
-  }
-}
-
-/* 响应式设计 - 移动端 */
-@media (max-width: 768px) {
-  .user-detail {
-    padding: 16px;
-  }
-  
-  .user-detail__header {
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-  }
-  
-  .user-detail__title {
-    font-size: 24px;
-  }
-  
-  .user-detail__card {
-    padding: 24px 20px;
-  }
-  
-  .user-detail__field {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 16px 0;
-  }
-  
-  .user-detail__field:hover {
-    margin: 0 -16px;
-    padding: 16px 16px;
-  }
-  
-  .user-detail__label {
-    min-width: auto;
-    margin-right: 0;
-    margin-bottom: 8px;
-    font-size: 14px;
-  }
-  
-  .user-detail__value {
-    font-size: 15px;
-  }
-  
-  .user-detail__error {
-    padding: 60px 24px;
-    margin: 16px;
-  }
-  
-  .user-detail__error h2 {
-    font-size: 20px;
-  }
-}
-
-/* 小屏幕优化 */
-@media (max-width: 480px) {
-  .user-detail {
-    padding: 12px;
-  }
-  
-  .user-detail__back-button {
-    padding: 8px 16px;
-    font-size: 13px;
-  }
-  
-  .user-detail__title {
-    font-size: 20px;
-  }
-  
-  .user-detail__card {
-    padding: 20px 16px;
-  }
-  
-  .user-detail__field {
-    padding: 14px 0;
-  }
-  
-  .user-detail__field:hover {
-    margin: 0 -12px;
-    padding: 14px 12px;
-  }
-  
-  .user-detail__error {
-    padding: 48px 20px;
-  }
 }

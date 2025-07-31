@@ -1,14 +1,16 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import userService from '../services/userService';
+import { useState, useEffect } from 'react';
+import { useNavigate, Form, useActionData, useNavigation } from 'react-router-dom';
+import Notification from '../components/User/Notification';
 import './NewUser.css';
 
 const NewUser = () => {
     console.log("NewUser rendering...")
 
     const navigate = useNavigate();
+    const actionData = useActionData();
+    const navigation = useNavigation();
 
-    // 表单数据状态
+    // 表单数据状态（用于受控组件）
     const [formData, setFormData] = useState({
         staff_id: '',
         first_name: '',
@@ -17,13 +19,38 @@ const NewUser = () => {
         is_active: true
     });
 
-    // 表单状态
-    const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [submitError, setSubmitError] = useState(null);
+    // 客户端验证错误状态
+    const [clientErrors, setClientErrors] = useState({});
+
+    // 通知状态
+    const [notification, setNotification] = useState({
+        show: false,
+        type: '',
+        message: '',
+    });
+
+    // 检查是否正在提交
+    const isSubmitting = navigation.state === 'submitting';
 
     const handleBack = () => {
         navigate('/users');
+    };
+
+    // 显示通知
+    const showNotification = (type, message) => {
+        setNotification({
+            show: true,
+            type,
+            message,
+        });
+    };
+
+    // 关闭通知
+    const handleCloseNotification = () => {
+        setNotification((prev) => ({
+            ...prev,
+            show: false,
+        }));
     };
 
     // 处理输入变化
@@ -33,192 +60,236 @@ const NewUser = () => {
             [field]: value
         }));
 
-        // 清除该字段的错误
-        if (errors[field]) {
-            setErrors(prev => ({
+        // 清除该字段的客户端验证错误
+        if (clientErrors[field]) {
+            setClientErrors(prev => ({
                 ...prev,
                 [field]: null
             }));
         }
     };
 
-    // 表单验证
+    // 客户端表单验证
     const validateForm = () => {
-        const newErrors = {};
+        const errors = {};
 
         if (!formData.staff_id.trim()) {
-            newErrors.staff_id = 'Staff ID is required';
-        } else if (!/^\d{8}$/.test(formData.staff_id)) {
-            newErrors.staff_id = 'Staff ID must be 8 digits';
+            errors.staff_id = 'This field should not be empty';
         }
 
         if (!formData.first_name.trim()) {
-            newErrors.first_name = 'First name is required';
+            errors.first_name = 'This field should not be empty';
         }
 
         if (!formData.last_name.trim()) {
-            newErrors.last_name = 'Last name is required';
+            errors.last_name = 'This field should not be empty';
         }
 
         if (!formData.location.trim()) {
-            newErrors.location = 'Location is required';
+            errors.location = 'This field should not be empty';
         }
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        setClientErrors(errors);
+        return Object.keys(errors).length === 0;
     };
 
     // 处理表单提交
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
+    const handleSubmit = (e) => {
         if (!validateForm()) {
-            return;
-        }
-
-        setLoading(true);
-        setSubmitError(null);
-
-        try {
-            await userService.createUser(formData);
-
-            // 创建成功，跳转回用户列表
-            navigate('/users');
-        } catch (error) {
-            console.error('Error creating user:', error);
-
-            if (error.type === 'ValidationError') {
-                setErrors(error.errors);
-            } else {
-                setSubmitError(error.message || 'Failed to create user');
-            }
-        } finally {
-            setLoading(false);
+            e.preventDefault(); // 阻止表单提交
         }
     };
 
+    // 获取字段错误信息（优先显示客户端错误）
+    const getFieldError = (fieldName) => {
+        return clientErrors[fieldName] || actionData?.errors?.[fieldName];
+    };
+
+    // 获取通用错误信息
+    const getGeneralError = () => {
+        return actionData?.errors?.general;
+    };
+
+    // 监听actionData变化，显示相应通知
+    useEffect(() => {
+        if (actionData) {
+            if (actionData.success) {
+                showNotification('success', 'User created successfully!');
+                // 可以选择在成功后清空表单
+                setTimeout(() => {
+                    navigate('/users');
+                }, 2000); // 2秒后跳转回用户列表
+            } else if (actionData.errors) {
+                if (actionData.errors.general) {
+                    showNotification('error', actionData.errors.general);
+                } else {
+                    showNotification('error', 'Failed to create user. Please check the form.');
+                }
+            }
+        }
+    }, [actionData, navigate]);
+
     return (
         <div className="new-user">
-            <div className="new-user__container">
-                <div className="new-user__header">
-                    <button onClick={handleBack} className="new-user__back-button">
+            <div className="new-user-container">
+                <div className="new-user-header">
+                    <button onClick={handleBack} className="new-user-back-button">
                         ← Back to Users
                     </button>
-                    <h1 className="new-user__title">Create New User</h1>
-                    <p className="new-user__subtitle">Add a new user to the system with their details</p>
+                    <h1 className="new-user-title">Create New User</h1>
+                    <p className="new-user-subtitle">Add a new user to the system with their details</p>
                 </div>
 
-                <div className="new-user__content">
-                    <form onSubmit={handleSubmit} className="new-user__form">
-                        <div className="new-user__card">
-                            {submitError && (
-                                <div className="new-user__error">
-                                    {submitError}
+                <div className="new-user-content">
+                    <Form method="post" className="new-user-form" noValidate onSubmit={handleSubmit}>
+                        <div className="new-user-card">
+                            {getGeneralError() && (
+                                <div className="new-user-error">
+                                    {getGeneralError()}
                                 </div>
                             )}
 
-                            <div className="new-user__field">
-                                <label className="new-user__label">Staff ID</label>
-                                <input
-                                    type="text"
-                                    className={`new-user__input ${errors.staff_id ? 'error' : ''}`}
-                                    value={formData.staff_id}
-                                    onChange={(e) => handleInputChange('staff_id', e.target.value)}
-                                    placeholder="Enter 8-digit staff ID"
-                                    maxLength={8}
-                                />
-                                {errors.staff_id && (
-                                    <div className="new-user__field-error">{errors.staff_id}</div>
-                                )}
-                            </div>
-
-                            <div className="new-user__field">
-                                <label className="new-user__label">First Name</label>
-                                <input
-                                    type="text"
-                                    className={`new-user__input ${errors.first_name ? 'error' : ''}`}
-                                    value={formData.first_name}
-                                    onChange={(e) => handleInputChange('first_name', e.target.value)}
-                                    placeholder="Enter first name"
-                                />
-                                {errors.first_name && (
-                                    <div className="new-user__field-error">{errors.first_name}</div>
-                                )}
-                            </div>
-
-                            <div className="new-user__field">
-                                <label className="new-user__label">Last Name</label>
-                                <input
-                                    type="text"
-                                    className={`new-user__input ${errors.last_name ? 'error' : ''}`}
-                                    value={formData.last_name}
-                                    onChange={(e) => handleInputChange('last_name', e.target.value)}
-                                    placeholder="Enter last name"
-                                />
-                                {errors.last_name && (
-                                    <div className="new-user__field-error">{errors.last_name}</div>
-                                )}
-                            </div>
-
-                            <div className="new-user__field">
-                                <label className="new-user__label">Work Location</label>
-                                <input
-                                    type="text"
-                                    className={`new-user__input ${errors.location ? 'error' : ''}`}
-                                    value={formData.location}
-                                    onChange={(e) => handleInputChange('location', e.target.value)}
-                                    placeholder="Enter work location"
-                                />
-                                {errors.location && (
-                                    <div className="new-user__field-error">{errors.location}</div>
-                                )}
-                            </div>
-
-                            <div className="new-user__field">
-                                <label className="new-user__label">Status</label>
-                                <div className="new-user__radio-group">
-                                    <label className="new-user__radio-label">
-                                        <input
-                                            type="radio"
-                                            name="is_active"
-                                            checked={formData.is_active === true}
-                                            onChange={() => handleInputChange('is_active', true)}
-                                        />
-                                        Active
-                                    </label>
-                                    <label className="new-user__radio-label">
-                                        <input
-                                            type="radio"
-                                            name="is_active"
-                                            checked={formData.is_active === false}
-                                            onChange={() => handleInputChange('is_active', false)}
-                                        />
-                                        Inactive
-                                    </label>
+                            <div className="new-user-field">
+                                <label className="new-user-label" htmlFor="staff_id">
+                                    <span className="new-user-required">*</span>
+                                    Staff ID
+                                </label>
+                                <div className="new-user-input-container">
+                                    <input
+                                        type="text"
+                                        id="staff_id"
+                                        name="staff_id"
+                                        className={`new-user-input ${getFieldError('staff_id') ? 'error' : ''}`}
+                                        value={formData.staff_id}
+                                        onChange={(e) => handleInputChange('staff_id', e.target.value)}
+                                        placeholder="Enter 8-digit staff ID"
+                                        maxLength={8}
+                                    />
+                                    {getFieldError('staff_id') && (
+                                        <div className="new-user-field-error">{getFieldError('staff_id')}</div>
+                                    )}
                                 </div>
                             </div>
 
-                            <div className="new-user__actions">
+                            <div className="new-user-field">
+                                <label className="new-user-label" htmlFor="first_name">
+                                    <span className="new-user-required">*</span>
+                                    First Name
+                                </label>
+                                <div className="new-user-input-container">
+                                    <input
+                                        type="text"
+                                        id="first_name"
+                                        name="first_name"
+                                        className={`new-user-input ${getFieldError('first_name') ? 'error' : ''}`}
+                                        value={formData.first_name}
+                                        onChange={(e) => handleInputChange('first_name', e.target.value)}
+                                        placeholder="Enter first name"
+                                    />
+                                    {getFieldError('first_name') && (
+                                        <div className="new-user-field-error">{getFieldError('first_name')}</div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="new-user-field">
+                                <label className="new-user-label" htmlFor="last_name">
+                                    <span className="new-user-required">*</span>
+                                    Last Name
+                                </label>
+                                <div className="new-user-input-container">
+                                    <input
+                                        type="text"
+                                        id="last_name"
+                                        name="last_name"
+                                        className={`new-user-input ${getFieldError('last_name') ? 'error' : ''}`}
+                                        value={formData.last_name}
+                                        onChange={(e) => handleInputChange('last_name', e.target.value)}
+                                        placeholder="Enter last name"
+                                    />
+                                    {getFieldError('last_name') && (
+                                        <div className="new-user-field-error">{getFieldError('last_name')}</div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="new-user-field">
+                                <label className="new-user-label" htmlFor="location">
+                                    <span className="new-user-required">*</span>
+                                    Work Location
+                                </label>
+                                <div className="new-user-input-container">
+                                    <input
+                                        type="text"
+                                        id="location"
+                                        name="location"
+                                        className={`new-user-input ${getFieldError('location') ? 'error' : ''}`}
+                                        value={formData.location}
+                                        onChange={(e) => handleInputChange('location', e.target.value)}
+                                        placeholder="Enter work location"
+                                    />
+                                    {getFieldError('location') && (
+                                        <div className="new-user-field-error">{getFieldError('location')}</div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="new-user-field">
+                                <label className="new-user-label">Status</label>
+                                <div className="new-user-input-container">
+                                    <div className="new-user-radio-group">
+                                        <label className="new-user-radio-label">
+                                            <input
+                                                type="radio"
+                                                name="is_active"
+                                                value="true"
+                                                checked={formData.is_active === true}
+                                                onChange={() => handleInputChange('is_active', true)}
+                                            />
+                                            Active
+                                        </label>
+                                        <label className="new-user-radio-label">
+                                            <input
+                                                type="radio"
+                                                name="is_active"
+                                                value="false"
+                                                checked={formData.is_active === false}
+                                                onChange={() => handleInputChange('is_active', false)}
+                                            />
+                                            Inactive
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="new-user-actions">
                                 <button
                                     type="button"
                                     onClick={handleBack}
-                                    className="new-user__cancel-button"
-                                    disabled={loading}
+                                    className="new-user-cancel-button"
+                                    disabled={isSubmitting}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="new-user__submit-button"
-                                    disabled={loading}
+                                    className="new-user-submit-button"
+                                    disabled={isSubmitting}
                                 >
-                                    {loading ? 'Creating User...' : 'Create User'}
+                                    {isSubmitting ? 'Creating User...' : 'Create User'}
                                 </button>
                             </div>
                         </div>
-                    </form>
+                    </Form>
                 </div>
             </div>
+
+            <Notification
+                show={notification.show}
+                type={notification.type}
+                message={notification.message}
+                onClose={handleCloseNotification}
+            />
         </div>
     );
 };

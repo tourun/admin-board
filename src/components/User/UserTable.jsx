@@ -3,8 +3,8 @@
  * 使用 @tanstack/react-table v8 实现用户数据表格
  */
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useNavigate, useFetcher } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { Form, useNavigation } from 'react-router-dom';
 import {
     useReactTable,
     getCoreRowModel,
@@ -33,18 +33,7 @@ const UserTable = ({
     sorter = {},
     onTableChange = () => { }
 }) => {
-    const navigate = useNavigate();
-    const fetcher = useFetcher();
-
-    // 处理删除用户
-    const handleDeleteUser = useCallback((userId) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
-            fetcher.submit(null, {
-                method: 'post',
-                action: `/users/${userId}/delete`
-            });
-        }
-    }, [fetcher]);
+    const navigation = useNavigation();
 
     // 排序状态
     const [sorting, setSorting] = useState([]);
@@ -106,23 +95,33 @@ const UserTable = ({
             enableSorting: false,
             cell: ({ row }) => (
                 <div className="actions-cell">
-                    <button
-                        className="view-detail-button"
-                        onClick={() => navigate(`/users/${row.original.staff_id}`)}
+                    <Form action={row.original.staff_id}>
+                        <button type="submit" className="view-detail-button">
+                            View Detail
+                        </button>
+                    </Form>
+                    <Form
+                        method="post"
+                        onSubmit={(e) => {
+                            if (!window.confirm('Are you sure you want to delete this user?')) {
+                                e.preventDefault();
+                            }
+                        }}
                     >
-                        View Detail
-                    </button>
-                    <button
-                        className="delete-button"
-                        onClick={() => handleDeleteUser(row.original.staff_id)}
-                        disabled={fetcher.state === 'submitting'}
-                    >
-                        {fetcher.state === 'submitting' ? 'Deleting...' : 'Delete'}
-                    </button>
+                        <input type="hidden" name="action" value="delete" />
+                        <input type="hidden" name="userId" value={row.original.staff_id} />
+                        <button
+                            type="submit"
+                            className="delete-button"
+                            disabled={navigation.state === 'submitting'}
+                        >
+                            {navigation.state === 'submitting' ? 'Deleting...' : 'Delete'}
+                        </button>
+                    </Form>
                 </div>
             ),
         },
-    ], [navigate, fetcher.state, handleDeleteUser]);
+    ], [navigation.state]);
 
     // 初始化表格实例
     const table = useReactTable({

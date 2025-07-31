@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useLoaderData, Outlet, useNavigate } from 'react-router-dom';
+import { useLoaderData, Form, useNavigation } from 'react-router-dom';
 import UserTable from '../components/User/UserTable';
 import Notification from '../components/User/Notification';
-import DeferredData from '../components/Common/DeferredData';
 import useUsers from '../hooks/useUsers';
 import './UserPage.css';
 
-// 用户页面内容组件 - 接收解析后的数据并处理所有业务逻辑
-const UserPageContent = ({ usersData }) => {
-    console.log("UserPageContent rendering with data:", usersData);
+const UserPage = () => {
+    console.log("UserPage rendering...")
 
-    const navigate = useNavigate();
+    const { usersData } = useLoaderData();
+    const navigation = useNavigation();
 
     // 使用自定义Hook获取用户数据和操作方法，传入初始数据
     const {
@@ -55,10 +54,14 @@ const UserPageContent = ({ usersData }) => {
         }
     }, [error]);
 
-    // 跳转到创建用户页面
-    const handleCreateUser = () => {
-        navigate('/users/new');
-    };
+    // 监听navigation状态，当删除操作完成时刷新数据
+    useEffect(() => {
+        // 当navigation状态从submitting变为idle时，检查是否是删除操作
+        if (navigation.state === 'idle' && navigation.formAction?.includes('/delete')) {
+            console.log('Delete operation completed, refreshing data...');
+            fetchUsers();
+        }
+    }, [navigation.state, navigation.formAction, fetchUsers]);
 
     // 处理重试加载
     const handleRetry = () => {
@@ -66,21 +69,23 @@ const UserPageContent = ({ usersData }) => {
     };
 
     return (
-        <>
-            <div className="user-page__header">
-                <h1 className="user-page__title">User Management</h1>
-                <button
-                    className="user-page__add-button"
-                    onClick={handleCreateUser}
-                    disabled={loading}
-                >
-                    Create New User
-                </button>
+        <div className="user-page">
+            <div className="user-page-header">
+                <h1 className="user-page-title">User Management</h1>
+                <Form action="/users/new" method="get">
+                    <button
+                        type="submit"
+                        className="user-page-add-button"
+                        disabled={loading}
+                    >
+                        Create New User
+                    </button>
+                </Form>
             </div>
 
-            <div className="user-page__content">
+            <div className="user-page-content">
                 {error ? (
-                    <div className="user-page__error">
+                    <div className="user-page-error">
                         <p>Failed to load data: {error}</p>
                         <button onClick={handleRetry}>Retry</button>
                     </div>
@@ -102,24 +107,6 @@ const UserPageContent = ({ usersData }) => {
                 message={notification.message}
                 onClose={handleCloseNotification}
             />
-        </>
-    );
-};
-
-// 主 UserPage 组件 - 处理数据加载
-const UserPage = () => {
-    console.log("UserPage rendering...")
-
-    const { usersData } = useLoaderData();
-
-    return (
-        <div className="user-page">
-            <DeferredData data={usersData}>
-                {(resolvedUsersData) => <UserPageContent usersData={resolvedUsersData} />}
-            </DeferredData>
-
-            {/* 嵌套路由出口 */}
-            <Outlet />
         </div>
     );
 };

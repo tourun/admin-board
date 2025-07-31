@@ -67,7 +67,7 @@
   color: #333;
 }
 
-.form-group input[type="text"],
+.form-group input[type='text'],
 .form-group select {
   width: 100%;
   padding: 8px 12px;
@@ -77,7 +77,7 @@
   transition: all 0.3s;
 }
 
-.form-group input[type="text"]:focus,
+.form-group input[type='text']:focus,
 .form-group select:focus {
   border-color: #1890ff;
   outline: none;
@@ -188,40 +188,40 @@
     width: 95%;
     max-height: 80vh;
   }
-  
+
   .modal-header {
     padding: 12px 16px;
   }
-  
+
   .modal-header h2 {
     font-size: 16px;
   }
-  
+
   .create-user-form {
     padding: 16px;
   }
-  
+
   .form-row {
     flex-direction: column;
     gap: 0;
   }
-  
+
   .form-group {
     margin-bottom: 12px;
   }
-  
-  .form-group input[type="text"],
+
+  .form-group input[type='text'],
   .form-group select {
     padding: 6px 10px;
     font-size: 13px;
   }
-  
+
   .form-actions {
     margin-top: 16px;
     flex-direction: column-reverse;
     gap: 8px;
   }
-  
+
   .cancel-button,
   .submit-button {
     width: 100%;

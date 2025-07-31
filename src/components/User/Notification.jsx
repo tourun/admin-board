@@ -26,7 +26,7 @@ const Notification = ({
         if (show) {
             const timer = setTimeout(() => {
                 onClose();
-            }, 3000);
+            }, 10000);
 
             return () => clearTimeout(timer);
         }
@@ -36,14 +36,14 @@ const Notification = ({
 
     return (
         <div className={`notification notification--${type}`}>
-            <div className="notification__content">
-                {type === 'success' && <span className="notification__icon">✓</span>}
-                {type === 'error' && <span className="notification__icon">✗</span>}
-                {type === 'info' && <span className="notification__icon">ℹ</span>}
-                <span className="notification__message">{message}</span>
+            <div className="notification-content">
+                {type === 'success' && <span className="notification-icon">✓</span>}
+                {type === 'error' && <span className="notification-icon">✗</span>}
+                {type === 'info' && <span className="notification-icon">ℹ</span>}
+                <span className="notification-message">{message}</span>
             </div>
             <button
-                className="notification__close"
+                className="notification-close"
                 onClick={onClose}
             >
                 ×

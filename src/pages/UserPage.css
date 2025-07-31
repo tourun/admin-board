@@ -1,31 +1,30 @@
-
 .user-page {
   padding: 32px;
   min-height: 100vh;
   background: transparent;
 }
 
-.user-page__header {
+.user-page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 3px solid #DC143C;
+  border-bottom: 3px solid #dc143c;
   position: relative;
 }
 
-.user-page__header::after {
+.user-page-header::after {
   content: '';
   position: absolute;
   bottom: -3px;
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, #DC143C, transparent);
+  background: linear-gradient(90deg, transparent, #dc143c, transparent);
 }
 
-.user-page__title {
+.user-page-title {
   margin: 0;
   font-size: 32px;
   font-weight: 700;
@@ -33,14 +32,14 @@
   letter-spacing: -0.5px;
 }
 
-.user-page__subtitle {
+.user-page-subtitle {
   margin: 8px 0 0 0;
   font-size: 16px;
   color: #666666;
   font-weight: 400;
 }
 
-.user-page__add-button {
+.user-page-add-button {
   padding: 8px 16px;
   background: #db0011;
   border: 1px solid #db0011;
@@ -55,17 +54,17 @@
   gap: 6px;
 }
 
-.user-page__add-button:hover:not(:disabled) {
+.user-page-add-button:hover:not(:disabled) {
   background: #83000a;
   border-color: #83000a;
 }
 
-.user-page__add-button:disabled {
+.user-page-add-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.user-page__content {
+.user-page-content {
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -73,31 +72,31 @@
   border: 1px solid #f1f5f9;
 }
 
-.user-page__error {
+.user-page-error {
   padding: 24px;
   background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
   border: 1px solid #feb2b2;
-  border-left: 4px solid #DC143C;
+  border-left: 4px solid #dc143c;
   border-radius: 8px;
-  color: #DC143C;
+  color: #dc143c;
   text-align: center;
   margin: 24px;
 }
 
-.user-page__error h3 {
+.user-page-error h3 {
   margin: 0 0 12px 0;
   font-size: 18px;
   font-weight: 600;
 }
 
-.user-page__error p {
+.user-page-error p {
   margin: 0 0 16px 0;
   font-size: 14px;
 }
 
-.user-page__error button {
+.user-page-error button {
   padding: 10px 20px;
-  background: #DC143C;
+  background: #dc143c;
   border: none;
   border-radius: 6px;
   color: white;
@@ -106,33 +105,33 @@
   transition: all 0.3s ease;
 }
 
-.user-page__error button:hover {
-  background: #B91C3C;
+.user-page-error button:hover {
+  background: #b91c3c;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
 }
 
-.user-page__placeholder {
+.user-page-placeholder {
   text-align: center;
   padding: 64px 32px;
   color: #718096;
 }
 
-.user-page__placeholder h3 {
+.user-page-placeholder h3 {
   margin: 0 0 12px 0;
   font-size: 20px;
   font-weight: 600;
   color: #4a5568;
 }
 
-.user-page__placeholder-info {
+.user-page-placeholder-info {
   font-size: 16px;
   margin: 0;
   line-height: 1.6;
 }
 
 /* 加载状态样式 */
-.user-page__loading {
+.user-page-loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -140,7 +139,7 @@
   padding: 64px;
 }
 
-.user-page__loading-spinner {
+.user-page-loading-spinner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -151,16 +150,16 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.user-page__loading-spinner .spinner {
+.user-page-loading-spinner .spinner {
   width: 48px;
   height: 48px;
   border: 4px solid #f1f5f9;
-  border-top: 4px solid #DC143C;
+  border-top: 4px solid #dc143c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
-.user-page__loading-spinner p {
+.user-page-loading-spinner p {
   margin: 0;
   color: #4a5568;
   font-size: 16px;
@@ -168,93 +167,10 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* 响应式设计 - 平板端 */
-@media (max-width: 1024px) {
-  .user-page {
-    padding: 24px;
+  0% {
+    transform: rotate(0deg);
   }
-  
-  .user-page__title {
-    font-size: 28px;
-  }
-  
-  .user-page__add-button {
-    padding: 12px 24px;
-    font-size: 14px;
-  }
-}
-
-/* 响应式设计 - 移动端 */
-@media (max-width: 768px) {
-  .user-page {
-    padding: 16px;
-  }
-  
-  .user-page__header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-  }
-  
-  .user-page__title {
-    font-size: 24px;
-  }
-  
-  .user-page__add-button {
-    width: 100%;
-    justify-content: center;
-    padding: 14px 0;
-  }
-  
-  .user-page__content {
-    border-radius: 8px;
-  }
-  
-  .user-page__error {
-    margin: 16px;
-    padding: 20px;
-  }
-  
-  .user-page__placeholder {
-    padding: 48px 24px;
-  }
-}
-
-/* 小屏幕优化 */
-@media (max-width: 480px) {
-  .user-page {
-    padding: 12px;
-  }
-  
-  .user-page__header {
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-  }
-  
-  .user-page__title {
-    font-size: 20px;
-  }
-  
-  .user-page__add-button {
-    padding: 12px 0;
-    font-size: 14px;
-  }
-  
-  .user-page__placeholder {
-    padding: 40px 16px;
-  }
-  
-  .user-page__placeholder h3 {
-    font-size: 18px;
-  }
-  
-  .user-page__placeholder-info {
-    font-size: 14px;
+  100% {
+    transform: rotate(360deg);
   }
 }

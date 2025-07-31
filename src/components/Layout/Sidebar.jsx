@@ -5,32 +5,26 @@ const Sidebar = () => {
     const navigationItems = [
         {
             path: '/users',
-            label: 'User',
-            icon: '👤'
+            label: 'User'
         },
         {
             path: '/roles',
-            label: 'Role',
-            icon: '🔐'
+            label: 'Role'
         }
     ]
 
     return (
         <nav className="sidebar">
-            <div className="sidebar__header">
-                <h2 className="sidebar__title">Admin System</h2>
-            </div>
-            <ul className="sidebar__menu">
+            <ul className="sidebar-menu">
                 {navigationItems.map((item) => (
-                    <li key={item.path} className="sidebar__menu-item">
+                    <li key={item.path} className="sidebar-menu-item">
                         <NavLink
                             to={item.path}
                             className={({ isActive }) =>
-                                `sidebar__menu-link ${isActive ? 'sidebar__menu-link--active' : ''}`
+                                `sidebar-menu-link ${isActive ? 'sidebar-menu-link--active' : ''}`
                             }
                         >
-                            <span className="sidebar__menu-icon">{item.icon}</span>
-                            <span className="sidebar__menu-text">{item.label}</span>
+                            <span className="sidebar-menu-text">{item.label}</span>
                         </NavLink>
                     </li>
                 ))}
