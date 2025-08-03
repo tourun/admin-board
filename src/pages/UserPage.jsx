@@ -1,114 +1,112 @@
-import { useState, useEffect } from 'react';
-import { useLoaderData, Form, useNavigation } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { useLoaderData, Form, useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import UserTable from '../components/User/UserTable';
-import Notification from '../components/User/Notification';
 import useUsers from '../hooks/useUsers';
 import './UserPage.css';
 
 const UserPage = () => {
-    console.log("UserPage rendering...")
+  const { usersData } = useLoaderData();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const hasProcessedDelete = useRef(false);
 
-    const { usersData } = useLoaderData();
-    const navigation = useNavigation();
+  console.log('🎯 UserPage rendering...', {
+    usersCount: usersData?.users?.length,
+    hasDeletedParam: searchParams.get('deleted'),
+  });
 
-    // 使用自定义Hook获取用户数据和操作方法，传入初始数据
-    const {
-        users,
-        loading,
-        error,
-        pagination,
-        filters,
-        sorter,
-        fetchUsers,
-        handleTableChange,
-    } = useUsers(usersData);
+  // 使用自定义Hook获取用户数据和操作方法，传入初始数据
+  const {
+    users,
+    loading,
+    error,
+    pagination,
+    filters,
+    sorter,
+    fetchUsers,
+    handleTableChange,
+  } = useUsers(usersData);
 
-    // 通知状态
-    const [notification, setNotification] = useState({
-        show: false,
-        type: '',
-        message: '',
-    });
+  // 显示通知
+  const showNotification = (type, message) => {
+    switch (type) {
+      case 'success':
+        toast.success(message);
+        break;
+      case 'error':
+        toast.error(message);
+        break;
+      case 'info':
+        toast.info(message);
+        break;
+      default:
+        toast(message);
+    }
+  };
 
-    // 显示通知
-    const showNotification = (type, message) => {
-        setNotification({
-            show: true,
-            type,
-            message,
-        });
-    };
+  // 监听错误状态
+  useEffect(() => {
+    if (error) {
+      showNotification('error', `Failed to load data: ${error}`);
+    }
+  }, [error]);
 
-    // 关闭通知
-    const handleCloseNotification = () => {
-        setNotification((prev) => ({
-            ...prev,
-            show: false,
-        }));
-    };
+  // 检查URL参数，显示删除成功通知并刷新数据
+  useEffect(() => {
+    const deleted = searchParams.get('deleted');
+    if (deleted === 'success' && !hasProcessedDelete.current) {
+      console.log('🎉 Showing delete success notification and refreshing data');
+      hasProcessedDelete.current = true;
+      showNotification('success', 'User deleted successfully!');
+      // 清除URL参数，使用replace避免历史记录堆积
+      setSearchParams({}, { replace: true });
+      // 刷新用户数据
+      fetchUsers();
+    } else if (deleted !== 'success') {
+      // 重置标志，为下次删除做准备
+      hasProcessedDelete.current = false;
+    }
+  }, [fetchUsers, searchParams, setSearchParams]);
 
-    // 监听错误状态
-    useEffect(() => {
-        if (error) {
-            showNotification('error', `Failed to load data: ${error}`);
-        }
-    }, [error]);
+  // 处理重试加载
+  const handleRetry = () => {
+    fetchUsers();
+  };
 
-    // 监听navigation状态，当删除操作完成时刷新数据
-    useEffect(() => {
-        // 当navigation状态从submitting变为idle时，检查是否是删除操作
-        if (navigation.state === 'idle' && navigation.formAction?.includes('/delete')) {
-            console.log('Delete operation completed, refreshing data...');
-            fetchUsers();
-        }
-    }, [navigation.state, navigation.formAction, fetchUsers]);
+  return (
+    <div className="user-page">
+      <div className="user-page-header">
+        <h1 className="user-page-title">User Management</h1>
+        <Form action="/users/new" method="get">
+          <button
+            type="submit"
+            className="user-page-add-button"
+            disabled={loading}
+          >
+            Create New User
+          </button>
+        </Form>
+      </div>
 
-    // 处理重试加载
-    const handleRetry = () => {
-        fetchUsers();
-    };
-
-    return (
-        <div className="user-page">
-            <div className="user-page-header">
-                <h1 className="user-page-title">User Management</h1>
-                <Form action="/users/new" method="get">
-                    <button
-                        type="submit"
-                        className="user-page-add-button"
-                        disabled={loading}
-                    >
-                        Create New User
-                    </button>
-                </Form>
-            </div>
-
-            <div className="user-page-content">
-                {error ? (
-                    <div className="user-page-error">
-                        <p>Failed to load data: {error}</p>
-                        <button onClick={handleRetry}>Retry</button>
-                    </div>
-                ) : (
-                    <UserTable
-                        users={users}
-                        loading={loading}
-                        pagination={pagination}
-                        filters={filters}
-                        sorter={sorter}
-                        onTableChange={handleTableChange}
-                    />
-                )}
-            </div>
-
-            <Notification
-                show={notification.show}
-                type={notification.type}
-                message={notification.message}
-                onClose={handleCloseNotification}
-            />
-        </div>
-    );
+      <div className="user-page-content">
+        {error ? (
+          <div className="user-page-error">
+            <p>Failed to load data: {error}</p>
+            <button onClick={handleRetry}>Retry</button>
+          </div>
+        ) : (
+          <UserTable
+            users={users}
+            loading={loading}
+            pagination={pagination}
+            filters={filters}
+            sorter={sorter}
+            onTableChange={handleTableChange}
+          />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default UserPage;

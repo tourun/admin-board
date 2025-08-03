@@ -12,7 +12,7 @@
   background: #2d2d2d;
   color: #ffffff;
   padding: 0 24px;
-  height: 56px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -35,7 +35,7 @@
 }
 
 .main-layout-logo-accent {
-  color: #db0011;
+  color: #ffffff;
   font-weight: 800;
 }
 

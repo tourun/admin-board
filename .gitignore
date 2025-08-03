@@ -16,6 +16,7 @@ dist-ssr
 .gitkeep
 __tests__
 
+.codebuddy
 
 # Editor directories and files
 .vscode/*

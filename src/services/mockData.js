@@ -6,22 +6,54 @@
 import { format } from 'date-fns';
 
 // 位置列表 - 国家缩写
-const locations = [
-    'US', 'UK', 'CN', 'AE', 'SG', 'JP', 'DE', 'FR', 'CA', 'AU'
-];
+const locations = ['US', 'UK', 'CN', 'AE', 'SG', 'JP', 'DE', 'FR', 'CA', 'AU'];
 
 // 名字列表 - 英文名字
 const firstNames = [
-    'John', 'Jane', 'Michael', 'Sarah', 'David', 'Emily', 'Robert', 'Lisa',
-    'William', 'Jessica', 'James', 'Ashley', 'Christopher', 'Amanda', 'Daniel', 'Stephanie',
-    'Matthew', 'Jennifer', 'Anthony', 'Elizabeth'
+  'John',
+  'Jane',
+  'Michael',
+  'Sarah',
+  'David',
+  'Emily',
+  'Robert',
+  'Lisa',
+  'William',
+  'Jessica',
+  'James',
+  'Ashley',
+  'Christopher',
+  'Amanda',
+  'Daniel',
+  'Stephanie',
+  'Matthew',
+  'Jennifer',
+  'Anthony',
+  'Elizabeth',
 ];
 
 // 姓氏列表 - 英文姓氏
 const lastNames = [
-    'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
-    'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas',
-    'Taylor', 'Moore', 'Jackson', 'Martin'
+  'Smith',
+  'Johnson',
+  'Williams',
+  'Brown',
+  'Jones',
+  'Garcia',
+  'Miller',
+  'Davis',
+  'Rodriguez',
+  'Martinez',
+  'Hernandez',
+  'Lopez',
+  'Gonzalez',
+  'Wilson',
+  'Anderson',
+  'Thomas',
+  'Taylor',
+  'Moore',
+  'Jackson',
+  'Martin',
 ];
 
 /**
@@ -30,12 +62,13 @@ const lastNames = [
  * @returns {string} - 随机ID
  */
 const generateId = (length = 8) => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
+  const chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
 };
 
 /**
@@ -43,11 +76,16 @@ const generateId = (length = 8) => {
  * @returns {string} - ISO格式日期字符串
  */
 const generateDate = () => {
-    const now = new Date();
-    const pastYear = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-    const randomTimestamp = pastYear.getTime() + Math.random() * (now.getTime() - pastYear.getTime());
-    const date = new Date(randomTimestamp);
-    return format(date, 'yyyy-MM-dd\'T\'HH:mm:ss.SSSxxx');
+  const now = new Date();
+  const pastYear = new Date(
+    now.getFullYear() - 1,
+    now.getMonth(),
+    now.getDate()
+  );
+  const randomTimestamp =
+    pastYear.getTime() + Math.random() * (now.getTime() - pastYear.getTime());
+  const date = new Date(randomTimestamp);
+  return format(date, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
 };
 
 /**
@@ -55,8 +93,8 @@ const generateDate = () => {
  * @returns {string} - 8位数字字符串的员工ID
  */
 const generateStaffId = () => {
-    const number = Math.floor(10000000 + Math.random() * 90000000);
-    return number.toString();
+  const number = Math.floor(10000000 + Math.random() * 90000000);
+  return number.toString();
 };
 
 /**
@@ -65,31 +103,33 @@ const generateStaffId = () => {
  * @returns {Array} - 用户数据数组
  */
 export const generateUsers = (count = 50) => {
-    const users = [];
+  const users = [];
 
-    for (let i = 0; i < count; i++) {
-        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-        const location = locations[Math.floor(Math.random() * locations.length)];
+  for (let i = 0; i < count; i++) {
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const location = locations[Math.floor(Math.random() * locations.length)];
 
-        const createdAt = generateDate();
-        const createdDate = new Date(createdAt);
-        const updatedAt = new Date(createdDate.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000); // 创建后0-30天内更新
+    const createdAt = generateDate();
+    const createdDate = new Date(createdAt);
+    const updatedAt = new Date(
+      createdDate.getTime() + Math.random() * 30 * 24 * 60 * 60 * 1000
+    ); // 创建后0-30天内更新
 
-        users.push({
-            id: generateId(),
-            staff_id: generateStaffId(),
-            location,
-            first_name: firstName,
-            last_name: lastName,
-            created_at: createdAt,
-            updated_at: updatedAt.toISOString(),
-            updated_by: `admin_${Math.floor(Math.random() * 5) + 1}`, // admin_1 到 admin_5
-            is_active: Math.random() > 0.2 // 80%的用户是激活状态
-        });
-    }
+    users.push({
+      id: generateId(),
+      staff_id: generateStaffId(),
+      location,
+      first_name: firstName,
+      last_name: lastName,
+      created_at: createdAt,
+      updated_at: updatedAt.toISOString(),
+      updated_by: `admin_${Math.floor(Math.random() * 5) + 1}`, // admin_1 到 admin_5
+      is_active: Math.random() > 0.2, // 80%的用户是激活状态
+    });
+  }
 
-    return users;
+  return users;
 };
 
 /**
@@ -99,9 +139,84 @@ export const generateUsers = (count = 50) => {
  * @returns {Promise} - 延迟Promise
  */
 export const simulateNetworkDelay = (min = 200, max = 500) => {
-    const delay = Math.floor(Math.random() * (max - min + 1)) + min;
-    return new Promise(resolve => setTimeout(resolve, delay));
+  const delay = Math.floor(Math.random() * (max - min + 1)) + min;
+  return new Promise((resolve) => setTimeout(resolve, delay));
+};
+
+// 角色列表
+const roles = [
+  { role_id: 'ADMIN', role_description: 'Administrator' },
+  { role_id: 'USER', role_description: 'Regular User' },
+  { role_id: 'MANAGER', role_description: 'Manager' },
+  { role_id: 'VIEWER', role_description: 'Viewer Only' },
+  { role_id: 'EDITOR', role_description: 'Content Editor' },
+];
+
+// 系统用户列表（用于created_by和updated_by）
+const systemUsers = [
+  {
+    id: 'sys_001',
+    staff_id: '10000001',
+    first_name: 'System',
+    last_name: 'Admin',
+  },
+  {
+    id: 'sys_002',
+    staff_id: '10000002',
+    first_name: 'John',
+    last_name: 'Manager',
+  },
+  {
+    id: 'sys_003',
+    staff_id: '10000003',
+    first_name: 'Sarah',
+    last_name: 'Supervisor',
+  },
+  {
+    id: 'sys_004',
+    staff_id: '10000004',
+    first_name: 'Mike',
+    last_name: 'Coordinator',
+  },
+  {
+    id: 'sys_005',
+    staff_id: '10000005',
+    first_name: 'Lisa',
+    last_name: 'Administrator',
+  },
+];
+
+/**
+ * 生成用户角色
+ * @returns {Array} - 用户角色数组
+ */
+const generateUserRoles = () => {
+  const roleCount = Math.floor(Math.random() * 3) + 1; // 1-3个角色
+  const selectedRoles = [];
+  const availableRoles = [...roles];
+
+  for (let i = 0; i < roleCount; i++) {
+    const randomIndex = Math.floor(Math.random() * availableRoles.length);
+    selectedRoles.push(availableRoles.splice(randomIndex, 1)[0]);
+  }
+
+  return selectedRoles;
 };
 
 // 预生成的用户数据集（100条记录）
 export const mockUsers = generateUsers(100);
+
+// 预生成的详细用户数据（用于getUserById）
+export const mockDetailedUsers = mockUsers.map((user) => {
+  const createdByUser =
+    systemUsers[Math.floor(Math.random() * systemUsers.length)];
+  const updatedByUser =
+    systemUsers[Math.floor(Math.random() * systemUsers.length)];
+
+  return {
+    ...user,
+    createdByUser,
+    updatedByUser,
+    userRoles: generateUserRoles(),
+  };
+});
