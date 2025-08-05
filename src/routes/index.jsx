@@ -10,6 +10,7 @@ import {
 
 // 懒加载页面组件
 const UserPage = lazy(() => import('../pages/UserPage'));
+const UserPageSimplified = lazy(() => import('../pages/UserPageSimplified'));
 const UserDetail = lazy(() => import('../pages/UserDetail'));
 const NewUser = lazy(() => import('../pages/NewUser'));
 const RolePage = lazy(() => import('../pages/RolePage'));
@@ -21,6 +22,12 @@ const router = createBrowserRouter([
     children: [
       {
         path: 'users',
+        element: <UserPageSimplified />,
+        loader: loadUsers,
+        action: deleteAction,
+      },
+      {
+        path: 'users-old',
         element: <UserPage />,
         loader: loadUsers,
         action: deleteAction,
