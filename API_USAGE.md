@@ -13,7 +13,7 @@
 ```javascript
 export const API_CONFIG = {
   // 是否使用mock数据 (true: 使用mock, false: 使用真实API)
-  USE_MOCK: false,
+  USE_MOCK: true,
   
   // 真实API基础URL
   BASE_URL: 'http://localhost:8080/v1',

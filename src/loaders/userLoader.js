@@ -3,7 +3,7 @@
  * 用于 React Router Data Router 的 loader 函数
  */
 
-import { json, redirect } from 'react-router-dom';
+import { json } from 'react-router-dom';
 import { fetchUsersData } from '../services/userDataService';
 import userService from '../services/userService';
 
@@ -34,6 +34,9 @@ const getUsersData = async () => {
  */
 export const loadUsers = async () => {
   console.log('📦 loadUsers called at:', new Date().toISOString());
+  console.log(
+    '🔍 loadUsers: This should be called automatically after delete action'
+  );
 
   const usersData = await getUsersData();
   console.log('✅ loadUsers completed at:', new Date().toISOString());
@@ -76,19 +79,30 @@ export const loadUser = async ({ params }) => {
  * @param {string} params.params.id - 用户ID
  * @returns {Promise<Response>} 重定向响应
  */
-export const deleteAction = async ({ params }) => {
+export const deleteAction = async ({ request }) => {
   try {
-    console.log('🗑️ Delete action called with params:', params);
-    const userId = params.id;
+    const formData = await request.formData();
+    const action = formData.get('action');
+
+    // 只处理删除操作
+    if (action !== 'delete') {
+      throw new Response('Invalid action', { status: 400 });
+    }
+
+    const userId = formData.get('userId');
+    console.log('🗑️ Delete action called with userId:', userId);
     console.log('Attempting to delete user with ID:', userId);
 
     const result = await userService.deleteUser(userId);
     console.log('Delete result:', result);
 
     if (result.success) {
-      console.log('✅ User deleted successfully, redirecting...');
-      // 删除成功，重定向到用户列表页面，带上成功参数
-      return redirect('/users?deleted=success');
+      console.log('✅ User deleted successfully');
+      console.log(
+        '🔄 deleteAction: Returning success, loader should be called automatically'
+      );
+      // 删除成功，返回成功状态，React Router 会自动重新调用 loader
+      return json({ success: true, message: 'User deleted successfully!' });
     } else {
       throw new Error('Failed to delete user');
     }

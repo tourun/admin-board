@@ -3,16 +3,16 @@
  * 使用 @tanstack/react-table v8 实现用户数据表格
  */
 
-import { useState, useMemo, useEffect } from 'react';
+import { useMemo, useCallback } from 'react';
 import { Form, useNavigation } from 'react-router-dom';
 import {
   useReactTable,
   getCoreRowModel,
   flexRender,
   getSortedRowModel,
+  getPaginationRowModel,
 } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import Pagination from './Pagination';
 import './UserTable.css';
 
 /**
@@ -36,22 +36,74 @@ const UserTable = ({
 }) => {
   const navigation = useNavigation();
 
-  // 排序状态
-  const [sorting, setSorting] = useState([]);
-
-  // 同步外部排序状态到内部状态
-  useEffect(() => {
+  // 简单的状态转换 - 只用于显示
+  const sorting = useMemo(() => {
     if (sorter && sorter.field) {
-      setSorting([
+      return [
         {
           id: sorter.field,
           desc: sorter.order === 'descend',
         },
-      ]);
-    } else {
-      setSorting([]);
+      ];
     }
+    return [];
   }, [sorter]);
+
+  const paginationState = useMemo(
+    () => ({
+      pageIndex: (pagination.current || 1) - 1, // React Table 使用 0 基索引
+      pageSize: pagination.pageSize || 10,
+    }),
+    [pagination]
+  );
+
+  // 处理排序变化 - 直接通知父组件
+  const handleSortingChange = useCallback(
+    (updater) => {
+      const nextSorting =
+        typeof updater === 'function' ? updater(sorting) : updater;
+
+      const newSorter =
+        nextSorting.length > 0
+          ? {
+              field: nextSorting[0].id,
+              order: nextSorting[0].desc ? 'descend' : 'ascend',
+            }
+          : {};
+
+      // 直接通知父组件，让父组件处理状态
+      onTableChange(pagination, filters, newSorter);
+    },
+    [sorting, pagination, filters, onTableChange]
+  );
+
+  // 处理分页变化 - 直接通知父组件
+  const handlePaginationChange = useCallback(
+    (updater) => {
+      console.log('🔄 handlePaginationChange called with updater:', updater);
+      console.log('📄 Current paginationState:', paginationState);
+
+      const nextPagination =
+        typeof updater === 'function' ? updater(paginationState) : updater;
+
+      console.log('📄 Next pagination:', nextPagination);
+
+      const newPagination = {
+        current: nextPagination.pageIndex + 1,
+        pageSize: nextPagination.pageSize,
+        total: pagination.total || 0,
+      };
+
+      console.log(
+        '📄 Calling onTableChange with newPagination:',
+        newPagination
+      );
+
+      // 直接通知父组件，让父组件处理状态
+      onTableChange(newPagination, filters, sorter);
+    },
+    [paginationState, pagination.total, filters, sorter, onTableChange]
+  );
 
   // 定义表格列
   const columns = useMemo(
@@ -103,7 +155,7 @@ const UserTable = ({
               </button>
             </Form>
             <Form
-              action={`${row.original.staff_id}/delete`}
+              action="/users"
               method="post"
               onSubmit={(e) => {
                 if (
@@ -113,12 +165,18 @@ const UserTable = ({
                 }
               }}
             >
+              <input
+                type="hidden"
+                name="userId"
+                value={row.original.staff_id}
+              />
+              <input type="hidden" name="action" value="delete" />
               <button
                 type="submit"
                 className="delete-button"
                 disabled={navigation.state === 'submitting'}
               >
-                Delete
+                {navigation.state === 'submitting' ? 'Deleting...' : 'Delete'}
               </button>
             </Form>
           </div>
@@ -134,33 +192,28 @@ const UserTable = ({
     columns,
     state: {
       sorting,
+      pagination: paginationState,
     },
-    onSortingChange: (updater) => {
-      const nextSorting =
-        typeof updater === 'function' ? updater(sorting) : updater;
-      setSorting(nextSorting);
-
-      // 将 @tanstack/react-table 的排序格式转换为 API 需要的格式
-      const newSorter =
-        nextSorting.length > 0
-          ? {
-              field: nextSorting[0].id,
-              order: nextSorting[0].desc ? 'descend' : 'ascend',
-            }
-          : {};
-
-      // 调用父组件传入的变更处理函数
-      onTableChange(pagination, filters, newSorter);
-    },
+    onSortingChange: handleSortingChange,
+    onPaginationChange: handlePaginationChange,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     manualSorting: true,
+    manualPagination: true, // 使用服务器端分页
+    autoResetPageIndex: false, // 禁用自动重置，我们手动控制
+    pageCount: Math.ceil((pagination.total || 0) / (pagination.pageSize || 10)), // 总页数
   });
 
-  // 处理分页变化
-  const handlePaginationChange = (newPagination) => {
-    onTableChange(newPagination, filters, sorter);
-  };
+  // 调试信息
+  console.log('🔍 Table debug info:', {
+    paginationState,
+    pagination,
+    pageCount: table.getPageCount(),
+    canNextPage: table.getCanNextPage(),
+    canPreviousPage: table.getCanPreviousPage(),
+    currentPageIndex: table.getState().pagination.pageIndex,
+  });
 
   return (
     <div className="user-table-container">
@@ -218,11 +271,89 @@ const UserTable = ({
         <div className="no-data">No data available</div>
       )}
 
-      <Pagination
-        pagination={pagination}
-        loading={loading}
-        onChange={handlePaginationChange}
-      />
+      {/* React Table 内置分页控件 */}
+      <div className="pagination">
+        <div className="pagination-info">
+          <span>
+            Showing{' '}
+            {table.getState().pagination.pageIndex *
+              table.getState().pagination.pageSize +
+              1}{' '}
+            to{' '}
+            {Math.min(
+              (table.getState().pagination.pageIndex + 1) *
+                table.getState().pagination.pageSize,
+              pagination.total || 0
+            )}
+            , Total: {pagination.total || 0}
+          </span>
+        </div>
+
+        <div className="pagination-controls">
+          <button
+            className="pagination-button"
+            onClick={() => {
+              console.log('🔄 First page button clicked');
+              table.setPageIndex(0);
+            }}
+            disabled={!table.getCanPreviousPage() || loading}
+          >
+            {'<<'}
+          </button>
+          <button
+            className="pagination-button"
+            onClick={() => {
+              console.log('🔄 Previous page button clicked');
+              table.previousPage();
+            }}
+            disabled={!table.getCanPreviousPage() || loading}
+          >
+            {'<'}
+          </button>
+          <button
+            className="pagination-button"
+            onClick={() => {
+              console.log('🔄 Next page button clicked');
+              console.log(
+                '📄 Current table state:',
+                table.getState().pagination
+              );
+              console.log('📄 Can go next?', table.getCanNextPage());
+              table.nextPage();
+            }}
+            disabled={!table.getCanNextPage() || loading}
+          >
+            {'>'}
+          </button>
+          <button
+            className="pagination-button"
+            onClick={() => {
+              console.log('🔄 Last page button clicked');
+              table.setPageIndex(table.getPageCount() - 1);
+            }}
+            disabled={!table.getCanNextPage() || loading}
+          >
+            {'>>'}
+          </button>
+        </div>
+
+        <div className="pagination-page-size">
+          <select
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => {
+              table.setPageSize(Number(e.target.value));
+            }}
+            disabled={loading}
+            className="page-size-select"
+          >
+            {[10, 20, 30, 40, 50].map((pageSize) => (
+              <option key={pageSize} value={pageSize}>
+                {pageSize} / page
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
     </div>
   );
 };

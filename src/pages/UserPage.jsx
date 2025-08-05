@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { useLoaderData, Form, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLoaderData, Form, useActionData } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import UserTable from '../components/User/UserTable';
 import useUsers from '../hooks/useUsers';
@@ -7,12 +7,11 @@ import './UserPage.css';
 
 const UserPage = () => {
   const { usersData } = useLoaderData();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const hasProcessedDelete = useRef(false);
+  const actionData = useActionData();
 
   console.log('🎯 UserPage rendering...', {
     usersCount: usersData?.users?.length,
-    hasDeletedParam: searchParams.get('deleted'),
+    actionData: actionData,
   });
 
   // 使用自定义Hook获取用户数据和操作方法，传入初始数据
@@ -51,22 +50,16 @@ const UserPage = () => {
     }
   }, [error]);
 
-  // 检查URL参数，显示删除成功通知并刷新数据
+  // 检查 action 返回数据，显示删除成功通知
   useEffect(() => {
-    const deleted = searchParams.get('deleted');
-    if (deleted === 'success' && !hasProcessedDelete.current) {
-      console.log('🎉 Showing delete success notification and refreshing data');
-      hasProcessedDelete.current = true;
-      showNotification('success', 'User deleted successfully!');
-      // 清除URL参数，使用replace避免历史记录堆积
-      setSearchParams({}, { replace: true });
-      // 刷新用户数据
-      fetchUsers();
-    } else if (deleted !== 'success') {
-      // 重置标志，为下次删除做准备
-      hasProcessedDelete.current = false;
+    if (actionData?.success) {
+      console.log('🎉 Showing delete success notification from actionData');
+      showNotification(
+        'success',
+        actionData.message || 'User deleted successfully!'
+      );
     }
-  }, [fetchUsers, searchParams, setSearchParams]);
+  }, [actionData]);
 
   // 处理重试加载
   const handleRetry = () => {

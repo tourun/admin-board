@@ -3,7 +3,7 @@
  * 用户数据状态管理，处理用户列表的获取、创建、分页、排序和筛选
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import '../services/userService';
 import { fetchUsersData } from '../services/userDataService';
 
@@ -13,9 +13,6 @@ import { fetchUsersData } from '../services/userDataService';
  * @returns {Object} 用户数据状态和操作方法
  */
 export const useUsers = (initialData = null) => {
-  // 用于跟踪是否已经初始化过数据
-  const initializedRef = useRef(false);
-
   // 用户数据状态 - 使用初始数据或默认值
   const [users, setUsers] = useState(initialData?.users || []);
   const [loading, setLoading] = useState(false);
@@ -36,39 +33,6 @@ export const useUsers = (initialData = null) => {
   // 排序状态
   const [sorter, setSorter] = useState({});
 
-  // 监听initialData变化，更新状态 - 避免重复更新
-  useEffect(() => {
-    if (initialData) {
-      console.log('🔄 useUsers: initialData changed', {
-        initialized: initializedRef.current,
-        usersCount: initialData.users?.length,
-        error: initialData.error,
-      });
-
-      // 检查数据是否真的发生了变化 - 使用更高效的比较方式
-      const hasDataChanged =
-        !initializedRef.current ||
-        initialData.users?.length !== users.length ||
-        initialData.error !== error;
-
-      if (hasDataChanged) {
-        console.log('✅ useUsers: Updating state with new data');
-        setUsers(initialData.users || []);
-        setError(initialData.error || null);
-        setPagination(
-          initialData.pagination || {
-            current: 1,
-            pageSize: 10,
-            total: 0,
-          }
-        );
-        initializedRef.current = true;
-      } else {
-        console.log('⏭️ useUsers: No data change detected, skipping update');
-      }
-    }
-  }, [initialData]);
-
   /**
    * 获取用户数据
    * @param {Object} params - 查询参数（可选）
@@ -86,11 +50,22 @@ export const useUsers = (initialData = null) => {
       setError(null);
 
       try {
+        console.log('🚀 fetchUsers called with queryParams:', queryParams);
         const result = await fetchUsersData(queryParams);
+
+        console.log('✅ fetchUsers result:', {
+          success: result.success,
+          usersCount: result.users?.length,
+          pagination: result.pagination,
+        });
 
         if (result.success) {
           setUsers(result.users);
-          setPagination(result.pagination);
+
+          // 使用传入的分页参数或API返回的分页信息
+          const finalPagination = params.pagination || result.pagination;
+          console.log('📄 Setting pagination to:', finalPagination);
+          setPagination(finalPagination);
 
           // 更新状态（如果是从参数传入的）
           if (params.filters) setFilters(params.filters);
@@ -115,15 +90,29 @@ export const useUsers = (initialData = null) => {
    * @param {Object} newSorter - 新的排序设置
    */
   const handleTableChange = (newPagination, newFilters, newSorter) => {
-    // 处理筛选变化时重置到第一页
+    console.log('🔄 handleTableChange called with:', {
+      newPagination,
+      newFilters,
+      newSorter,
+      currentPagination: pagination,
+    });
+
+    // 检查筛选是否发生变化
+    const filtersChanged = Object.keys(newFilters || {}).some(
+      (key) => newFilters[key] !== filters[key]
+    );
+
+    // 检查排序是否发生变化
+    const sorterChanged =
+      JSON.stringify(newSorter || {}) !== JSON.stringify(sorter || {});
+
+    // 处理筛选或排序变化时重置到第一页
     const updatedPagination = {
       ...newPagination,
-      current: Object.keys(newFilters || {}).some(
-        (key) => newFilters[key] !== filters[key]
-      )
-        ? 1
-        : newPagination.current,
+      current: filtersChanged || sorterChanged ? 1 : newPagination.current,
     };
+
+    console.log('📄 Final pagination params:', updatedPagination);
 
     fetchUsers({
       pagination: updatedPagination,

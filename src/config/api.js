@@ -12,7 +12,7 @@ export const API_CONFIG = {
 
   // API端点
   ENDPOINTS: {
-    USERS_PAGINATION: '/user/pagination',
+    USERS: '/user',
     USER_BY_ID: '/user',
     CREATE_USER: '/user',
     DELETE_USER: '/user',

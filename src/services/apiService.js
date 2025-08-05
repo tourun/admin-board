@@ -42,6 +42,46 @@ const apiRequest = async (url, options = {}) => {
 };
 
 /**
+ * 字段映射：将API返回的字段名映射到前端使用的字段名
+ * @param {Object} apiUser - API返回的用户对象
+ * @returns {Object} 前端使用的用户对象
+ */
+const mapApiUserToFrontend = (apiUser) => {
+  return {
+    id: apiUser.userId,
+    staff_id: apiUser.staffId,
+    first_name: apiUser.firstName,
+    last_name: apiUser.lastName,
+    location: apiUser.locationCode,
+    is_active: apiUser.active,
+    // 保留原始API字段以备后用
+    userId: apiUser.userId,
+    staffId: apiUser.staffId,
+    firstName: apiUser.firstName,
+    lastName: apiUser.lastName,
+    locationCode: apiUser.locationCode,
+    active: apiUser.active,
+  };
+};
+
+/**
+ * 字段映射：将前端字段名映射到API字段名
+ * @param {string} frontendField - 前端字段名
+ * @returns {string} API字段名
+ */
+const mapFrontendFieldToApi = (frontendField) => {
+  const fieldMap = {
+    id: 'userId',
+    staff_id: 'staffId',
+    first_name: 'firstName',
+    last_name: 'lastName',
+    location: 'locationCode',
+    is_active: 'active',
+  };
+  return fieldMap[frontendField] || frontendField;
+};
+
+/**
  * 获取用户列表（分页）
  * @param {Object} params - 查询参数
  * @param {Object} params.pagination - 分页参数 {current, pageSize}
@@ -54,26 +94,31 @@ export const getUsersFromApi = async (params = {}) => {
 
   // 构建查询参数
   const queryParams = {
-    page: pagination.current - 1, // 后端通常从0开始
+    page: pagination.current - 1, // API从0开始计数
     size: pagination.pageSize,
   };
 
   // 添加排序参数
   if (sorter.field) {
-    queryParams.sort = `${sorter.field},${sorter.order === 'descend' ? 'desc' : 'asc'}`;
+    // 将前端字段名映射到API字段名
+    const apiField = mapFrontendFieldToApi(sorter.field);
+    const order = sorter.order === 'descend' ? 'DESC' : 'ASC';
+    queryParams.sort = `${apiField},${order}`;
   }
 
-  const url = buildApiUrl(API_CONFIG.ENDPOINTS.USERS_PAGINATION, queryParams);
+  const url = buildApiUrl(API_CONFIG.ENDPOINTS.USERS, queryParams);
 
   try {
     const response = await apiRequest(url);
 
-    // 假设后端返回格式为: { content: [...], totalElements: number, number: number, size: number }
+    // 映射API返回的用户数据到前端格式
+    const mappedUsers = (response.content || []).map(mapApiUserToFrontend);
+
     return {
-      data: response.content || [],
+      data: mappedUsers,
       pagination: {
-        page: (response.number || 0) + 1, // 转换为从1开始
-        pageSize: response.size || pagination.pageSize,
+        page: (response.pageable?.pageNumber || 0) + 1, // 转换为从1开始
+        pageSize: response.pageable?.pageSize || pagination.pageSize,
         total: response.totalElements || 0,
       },
     };
@@ -85,19 +130,36 @@ export const getUsersFromApi = async (params = {}) => {
 
 /**
  * 根据ID获取单个用户
- * @param {string} userId - 用户ID
+ * @param {string} userId - 用户ID (staffId)
  * @returns {Promise} 用户数据
  */
 export const getUserByIdFromApi = async (userId) => {
   const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.USER_BY_ID}/${userId}`);
 
   try {
-    const user = await apiRequest(url);
-    return user;
+    const apiUser = await apiRequest(url);
+    // 映射API返回的用户数据到前端格式
+    return mapApiUserToFrontend(apiUser);
   } catch (error) {
     console.error(`Failed to fetch user ${userId} from API:`, error);
     throw new Error(`User with ID ${userId} not found`);
   }
+};
+
+/**
+ * 将前端用户数据映射到API格式
+ * @param {Object} frontendUser - 前端用户对象
+ * @returns {Object} API格式的用户对象
+ */
+const mapFrontendUserToApi = (frontendUser) => {
+  return {
+    staffId: frontendUser.staff_id,
+    firstName: frontendUser.first_name,
+    lastName: frontendUser.last_name,
+    locationCode: frontendUser.location,
+    active:
+      frontendUser.is_active !== undefined ? frontendUser.is_active : true,
+  };
 };
 
 /**
@@ -108,13 +170,17 @@ export const getUserByIdFromApi = async (userId) => {
 export const createUserFromApi = async (userData) => {
   const url = buildApiUrl(API_CONFIG.ENDPOINTS.CREATE_USER);
 
+  // 将前端数据格式映射到API格式
+  const apiUserData = mapFrontendUserToApi(userData);
+
   try {
-    const newUser = await apiRequest(url, {
+    const apiUser = await apiRequest(url, {
       method: 'POST',
-      body: JSON.stringify(userData),
+      body: JSON.stringify(apiUserData),
     });
 
-    return newUser;
+    // 映射API返回的用户数据到前端格式
+    return mapApiUserToFrontend(apiUser);
   } catch (error) {
     console.error('Failed to create user via API:', error);
 
@@ -132,7 +198,7 @@ export const createUserFromApi = async (userData) => {
 
 /**
  * 删除用户
- * @param {string} userId - 用户ID
+ * @param {string} userId - 用户ID (staffId)
  * @returns {Promise} 删除结果
  */
 export const deleteUserFromApi = async (userId) => {
@@ -159,6 +225,8 @@ const apiService = {
   getUserByIdFromApi,
   createUserFromApi,
   deleteUserFromApi,
+  mapApiUserToFrontend,
+  mapFrontendUserToApi,
 };
 
 export default apiService;
