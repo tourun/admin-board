@@ -26,6 +26,8 @@ export const fetchUsersData = async (params = {}) => {
     sorter: { ...defaultParams.sorter, ...params.sorter },
   };
 
+  console.log('🔄 fetchUsersData called with queryParams:', queryParams);
+
   try {
     const response = await userService.getUsers(queryParams);
 

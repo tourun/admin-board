@@ -93,6 +93,17 @@ const getUsersFromMock = async (params = {}) => {
 
   // 应用排序
   if (sorter.field) {
+    console.log('🔄 Mock sorting applied:', {
+      field: sorter.field,
+      order: sorter.order,
+    });
+    console.log(
+      '📄 First few users before sorting:',
+      filteredUsers
+        .slice(0, 3)
+        .map((u) => ({ staff_id: u.staff_id, [sorter.field]: u[sorter.field] }))
+    );
+
     filteredUsers.sort((a, b) => {
       let compareA = a[sorter.field];
       let compareB = b[sorter.field];
@@ -111,6 +122,15 @@ const getUsersFromMock = async (params = {}) => {
       }
       return 0;
     });
+
+    console.log(
+      '📄 First few users after sorting:',
+      filteredUsers
+        .slice(0, 3)
+        .map((u) => ({ staff_id: u.staff_id, [sorter.field]: u[sorter.field] }))
+    );
+  } else {
+    console.log('⏭️ No sorting applied, sorter:', sorter);
   }
 
   // 应用分页

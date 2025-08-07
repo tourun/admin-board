@@ -1,19 +1,14 @@
-import { useState, useEffect } from 'react';
-import {
-  useNavigate,
-  Form,
-  useActionData,
-  useNavigation,
-} from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useUsers } from '../hooks/useUsersNew';
 import './NewUser.css';
 
 const NewUser = () => {
   console.log('NewUser rendering...');
 
   const navigate = useNavigate();
-  const actionData = useActionData();
-  const navigation = useNavigation();
+  const { createUser, loading } = useUsers();
 
   // 表单数据状态（用于受控组件）
   const [formData, setFormData] = useState({
@@ -26,9 +21,10 @@ const NewUser = () => {
 
   // 客户端验证错误状态
   const [clientErrors, setClientErrors] = useState({});
-
-  // 检查是否正在提交
-  const isSubmitting = navigation.state === 'submitting';
+  // 服务器端错误状态
+  const [serverErrors, setServerErrors] = useState({});
+  // 提交状态
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleBack = () => {
     navigate('/users');
@@ -58,9 +54,14 @@ const NewUser = () => {
       [field]: value,
     }));
 
-    // 清除该字段的客户端验证错误
     if (clientErrors[field]) {
       setClientErrors((prev) => ({
+        ...prev,
+        [field]: null,
+      }));
+    }
+    if (serverErrors[field]) {
+      setServerErrors((prev) => ({
         ...prev,
         [field]: null,
       }));
@@ -92,41 +93,48 @@ const NewUser = () => {
   };
 
   // 处理表单提交
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (!validateForm()) {
-      e.preventDefault(); // 阻止表单提交
+      return;
+    }
+
+    setIsSubmitting(true);
+    setServerErrors({});
+
+    try {
+      const result = await createUser(formData);
+
+      if (result.success) {
+        showNotification(
+          'success',
+          result.message || 'User created successfully!'
+        );
+        navigate('/users');
+      } else {
+        if (result.errors) {
+          setServerErrors(result.errors);
+        } else {
+          showNotification('error', result.message || 'Failed to create user');
+        }
+      }
+    } catch (error) {
+      console.error('Create user error:', error);
+      showNotification('error', 'An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // 获取字段错误信息（优先显示客户端错误）
   const getFieldError = (fieldName) => {
-    return clientErrors[fieldName] || actionData?.errors?.[fieldName];
+    return clientErrors[fieldName] || serverErrors[fieldName];
   };
 
   // 获取通用错误信息
   const getGeneralError = () => {
-    return actionData?.errors?.general;
+    return serverErrors.general;
   };
-
-  // 监听actionData变化，显示相应通知
-  useEffect(() => {
-    if (actionData) {
-      if (actionData.success) {
-        showNotification('success', 'User created successfully!');
-        // 立即跳转回用户列表
-        navigate('/users');
-      } else if (actionData.errors) {
-        if (actionData.errors.general) {
-          showNotification('error', actionData.errors.general);
-        } else {
-          showNotification(
-            'error',
-            'Failed to create user. Please check the form.'
-          );
-        }
-      }
-    }
-  }, [actionData, navigate]);
 
   return (
     <div className="new-user">
@@ -142,12 +150,7 @@ const NewUser = () => {
         </div>
 
         <div className="new-user-content">
-          <Form
-            method="post"
-            className="new-user-form"
-            noValidate
-            onSubmit={handleSubmit}
-          >
+          <form className="new-user-form" noValidate onSubmit={handleSubmit}>
             <div className="new-user-card">
               {getGeneralError() && (
                 <div className="new-user-error">{getGeneralError()}</div>
@@ -287,20 +290,20 @@ const NewUser = () => {
                   type="button"
                   onClick={handleBack}
                   className="new-user-cancel-button"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || loading}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   className="new-user-submit-button"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || loading}
                 >
-                  Create User
+                  {isSubmitting || loading ? 'Creating...' : 'Create User'}
                 </button>
               </div>
             </div>
-          </Form>
+          </form>
         </div>
       </div>
     </div>

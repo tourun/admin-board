@@ -1,6 +1,6 @@
 import { Outlet, useNavigation } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import GlobalLoader from '../Loading/GlobalLoader';
+import LoadingSpinner from '../Common/LoadingSpinner';
 import './MainLayout.css';
 
 const MainLayout = () => {
@@ -35,9 +35,11 @@ const MainLayout = () => {
           >
             <Outlet />
             {navigation.state === 'loading' && (
-              <div className="main-layout-loading-overlay">
-                <GlobalLoader message="Loading..." />
-              </div>
+              <LoadingSpinner
+                size="large"
+                message="Loading page..."
+                overlay={true}
+              />
             )}
           </div>
         </div>

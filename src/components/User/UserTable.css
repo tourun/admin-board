@@ -88,22 +88,7 @@
   opacity: 1;
 }
 
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #4a5568;
-  z-index: 100;
-  backdrop-filter: blur(2px);
-}
+/* Loading overlay styles moved to LoadingSpinner component */
 
 .no-data {
   padding: 64px 32px;
@@ -226,6 +211,31 @@
   color: #6c757d;
   font-size: 14px;
 }
+
+/* Create New User 按钮样式 - 与 Delete 按钮风格一致 */
+.create-user-button {
+  background: #db0011;
+  color: white;
+  border: 1px solid #db0011;
+  padding: 6px 12px;
+  border-radius: 0; /* 方角 */
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.create-user-button:hover:not(:disabled) {
+  background: #83000a;
+  border-color: #83000a;
+}
+
+.create-user-button:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  border-color: #d1d5db;
+  cursor: not-allowed;
+}
 /* React Table 分页样式 */
 .pagination {
   display: flex;
@@ -307,6 +317,19 @@
   font-size: 14px;
   line-height: 1.5; /* 统一行高 */
   margin-right: 16px; /* 右侧留白 */
+}
+
+/* 当前页按钮样式 */
+.pagination-button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+  cursor: not-allowed;
+}
+
+.pagination-button.active:hover {
+  background: #007bff;
+  border-color: #007bff;
 }
 
 /* 响应式设计 */
